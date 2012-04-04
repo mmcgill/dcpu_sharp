@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Com.MattMcGill.Dcpu {
     /// <summary>
@@ -21,16 +18,35 @@ namespace Com.MattMcGill.Dcpu {
         public abstract IState Apply(IState state);
 
         /// <summary>
-        /// Decode the operand.
+        /// Read the operand.
         /// </summary>
-        /// <param name="operand">operand to decode</param>
+        /// <param name="operand">operand to read</param>
         /// <param name="prev">current DCPU state</param>
-        /// <param name="next">DCPU state after decoding</param>
+        /// <param name="next">DCPU state after reading</param>
         /// <returns>a value</returns>
         /// <remarks>
-        /// Decode only modifies DCPU state for PUSH and POP operands.
+        /// GetOperand modifies SP for PUSH and POP operands,
+        /// and the PC for addressing modes that read the next
+        /// word of RAM.
+        /// 
+        /// We're presently assuming that getting an operand never
+        /// affects the Overflow register.
         /// </remarks>
-        public static ushort Decode(byte operand, IState prev, out IState next) {
+        public static ushort GetOperand(byte operand, IState prev, out IState next) {
+            next = prev;
+            if (0 <= operand && operand < 8) { // register
+                return prev.Get((RegisterName) operand);
+            }
+            if (8 <= operand && operand < 16) { // [register]
+                return prev.Get(prev.Get((RegisterName) (operand & 0x07)));
+            }
+            if (16 <= operand && operand < 24) { // [next word + register]
+                var pc = (ushort) (prev.Get(RegisterName.PC) + 1);
+                var addr = (ushort) (prev.Get(pc) + prev.Get((RegisterName) (operand & 0x07)));
+                var result = prev.Get(addr);
+                next = prev.Set(RegisterName.PC, pc);
+                return result;
+            }
             throw new NotImplementedException();
         }
     }
