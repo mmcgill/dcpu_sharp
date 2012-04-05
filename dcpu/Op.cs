@@ -47,6 +47,45 @@ namespace Com.MattMcGill.Dcpu {
                 next = prev.Set(RegisterName.PC, pc);
                 return result;
             }
+            if (operand == 0x18) { // [SP++]
+                var addr = prev.Get(RegisterName.SP);
+                var result = prev.Get(addr);
+                next = prev.Set(RegisterName.SP, (ushort)(addr + 1));
+                return result;
+            }
+            if (operand == 0x19) { // [SP]
+                return prev.Get(prev.Get(RegisterName.SP));
+            }
+            if (operand == 0x1a) { // [--SP]
+                var addr = (ushort)(prev.Get(RegisterName.SP) - 1);
+                var result = prev.Get(addr);
+                next = prev.Set(RegisterName.SP, addr);
+                return result;
+            }
+            if (operand == 0x1b) { // SP
+                return prev.Get(RegisterName.SP);
+            }
+            if (operand == 0x1c) { // PC
+                return prev.Get(RegisterName.PC);
+            }
+            if (operand == 0x1d) { // O
+                return prev.Get(RegisterName.O);
+            }
+            if (operand == 0x1e) { // [next word]
+                var addr = prev.Get(RegisterName.PC);
+                var result = prev.Get(prev.Get(addr));
+                next = prev.Set(RegisterName.PC, (ushort)(addr + 1));
+                return result;
+            }
+            if (operand == 0x1f) { // next literal
+                var addr = prev.Get(RegisterName.PC);
+                var result = prev.Get(addr);
+                next = prev.Set(RegisterName.PC, (ushort)(addr + 1));
+                return result;
+            }
+            if (0x20 <= operand && operand < 0x40) { // literal
+                return (ushort)(operand - 0x20);
+            }
             throw new NotImplementedException();
         }
     }
