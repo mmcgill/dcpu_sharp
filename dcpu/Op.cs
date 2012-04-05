@@ -88,5 +88,67 @@ namespace Com.MattMcGill.Dcpu {
             }
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Write the operand.
+        /// </summary>
+        /// <param name="operand">operand to write</param>
+        /// <param name="state">current DCPU state</param>
+        /// <param name="value">value to write</param>
+        /// <returns>DCPU state after writing</returns>
+        /// <remarks>
+        /// We're presently assuming that getting an operand write (other than 0x1d) never
+        /// affects the Overflow register.
+        /// </remarks>
+        public static IState SetOperand(ushort operand, ushort value, IState state) {
+            if (0x0 <= operand && operand < 0x8) { // register
+                return state.Set((RegisterName)operand, value);
+            }
+            if (0x8 <= operand && operand < 0x10) { // [register]
+                var addr = state.Get((RegisterName)(operand - 0x8));
+                return state.Set(addr, value);
+            }
+            if (0x10 <= operand && operand < 0x18) { // [next word + register]
+                var pc = state.Get(RegisterName.PC);
+                var addr = state.Get(pc);
+                var offset = state.Get((RegisterName)(operand - 0x10));
+                return state.Set(RegisterName.PC, (ushort)(pc + 1))
+                            .Set((ushort)(addr + offset), value);
+            }
+            if (operand == 0x18) { // [SP++]
+                var addr = state.Get(RegisterName.SP);
+                return state.Set(addr, value).Set(RegisterName.SP, (ushort)(addr + 1));
+            }
+            if (operand == 0x19) { // [SP]
+                return state.Set(state.Get(RegisterName.SP), value);
+            }
+            if (operand == 0x1a) { // [--SP]
+                var addr = (ushort) (state.Get(RegisterName.SP) - 1);
+                return state.Set(addr, value).Set(RegisterName.SP, addr);
+            }
+            if (operand == 0x1b) { // SP
+                return state.Set(RegisterName.SP, value);
+            }
+            if (operand == 0x1c) { // PC
+                return state.Set(RegisterName.PC, value);
+            }
+            if (operand == 0x1d) { // O
+                return state.Set(RegisterName.O, value);
+            }
+            if (operand == 0x1e) { // [next word]
+                var addr = state.Get(RegisterName.PC);
+                return state.Set(addr, value).Set(RegisterName.PC, (ushort)(addr + 1));
+            }
+            if (operand == 0x1f) { // next word
+                var addr = state.Get(RegisterName.PC);
+                return state.Set(RegisterName.PC, (ushort)(addr + 1));
+            }
+            if (0x20 <= operand && operand < 0x40) { // literal
+                var addr = state.Get (RegisterName.PC);
+                return state.Set (RegisterName.PC, (ushort)(addr + 1));
+            }
+            throw new NotImplementedException();
+        }
+
     }
 }
