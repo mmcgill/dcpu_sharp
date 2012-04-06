@@ -6,6 +6,13 @@ namespace Com.MattMcGill.Dcpu.Tests
     public class OpTests {
 
         [Test]
+        public void Set_SetRegisterToLiteral_RegisterHasCorrectValue() {
+            var prev = new MutableState();
+            var next = new Set(0x0, 0x25).Apply(prev);
+            Assert.AreEqual(5, next.Get(RegisterName.A));
+        }
+
+        [Test]
         public void GetOperand_RegisterValue_ReturnsCorrectRegisterValue() {
             var prev = new MutableState();
             prev.Set(RegisterName.A, 34);

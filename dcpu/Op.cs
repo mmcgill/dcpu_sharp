@@ -204,4 +204,14 @@ namespace Com.MattMcGill.Dcpu {
         }
 
     }
+
+    public class Set : Op {
+        public Set(byte a, byte b) : base("SET", a, b) {}
+
+        public override IState Apply (IState state) {
+            IState s1;
+            var val = Op.GetOperand(B, state, out s1);
+            return Op.SetOperand(A, val, s1);
+        }
+    }
 }
