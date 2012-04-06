@@ -86,7 +86,7 @@ namespace Com.MattMcGill.Dcpu {
             if (0x20 <= operand && operand < 0x40) { // literal
                 return (ushort)(operand - 0x20);
             }
-            throw new NotImplementedException();
+            throw new ArgumentException("Invalid operand " + operand);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Com.MattMcGill.Dcpu {
                 var addr = state.Get (RegisterName.PC);
                 return state.Set (RegisterName.PC, (ushort)(addr + 1));
             }
-            throw new NotImplementedException();
+            throw new ArgumentException("Invalid operand " + operand);
         }
 
     }
