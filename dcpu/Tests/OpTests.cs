@@ -13,6 +13,42 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
+        public void Add_AddLiteralToRegister_RegisterHasCorrectSum() {
+            var prev = new MutableState().Set(RegisterName.A, 14);
+            var next = new Add(0x0, 0x25).Apply(prev);
+            Assert.AreEqual(19, next.Get(RegisterName.A));
+        }
+
+        [Test]
+        public void Add_AddLiteralToRegister_OverflowCleared() {
+            var prev = new MutableState().Set(RegisterName.O, 1);
+            var next = new Add(0x0, 0x25).Apply(prev);
+            Assert.AreEqual(0, next.Get(RegisterName.O));
+        }
+
+        [Test]
+        public void Add_AddLiteralToRegisterWithOverflow_OverflowAndRegisterHaveCorrectValues() {
+            var prev = new MutableState().Set(RegisterName.A, 0xFFFE);
+            var next = new Add(0x0, 0x25).Apply(prev);
+            Assert.AreEqual(1, next.Get(RegisterName.O));
+            Assert.AreEqual(0x3, next.Get(RegisterName.A));
+        }
+
+        [Test]
+        public void Add_AddToOverflowRegisterWithoutOverflow_OverflowIsZero() {
+            var prev = new MutableState().Set(RegisterName.O, 1);
+            var next = new Add(0x1d, 0x25).Apply(prev);
+            Assert.AreEqual(0, next.Get(RegisterName.O));
+        }
+
+        [Test]
+        public void Add_AddToOverflowRegisterWithOverflow_OverflowIsOne() {
+            var prev = new MutableState().Set(RegisterName.O, 1).Set(RegisterName.A, 0xFFFF);
+            var next = new Add(0x1d, 0x0).Apply(prev);
+            Assert.AreEqual(1, next.Get(RegisterName.O));
+        }
+
+        [Test]
         public void GetOperand_RegisterValue_ReturnsCorrectRegisterValue() {
             var prev = new MutableState();
             prev.Set(RegisterName.A, 34);

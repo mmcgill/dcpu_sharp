@@ -214,4 +214,16 @@ namespace Com.MattMcGill.Dcpu {
             return Op.SetOperand(A, val, s1);
         }
     }
+
+    public class Add : Op {
+        public Add(byte a, byte b) : base("ADD", a, b) {}
+
+        public override IState Apply (IState state) {
+            IState s1, s2;
+            var a = Op.GetOperand(A, state, out s1);
+            var b = Op.GetOperand(B, s1, out s2);
+            var sum = (uint)a + (uint)b;
+            return Op.SetOperand(A, (ushort)sum, s2).Set(RegisterName.O, (ushort)(sum >> 16));
+        }
+    }
 }
