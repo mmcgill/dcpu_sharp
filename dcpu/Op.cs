@@ -226,4 +226,16 @@ namespace Com.MattMcGill.Dcpu {
             return Op.SetOperand(A, (ushort)sum, s2).Set(RegisterName.O, (ushort)(sum >> 16));
         }
     }
+
+    public class Sub : Op {
+        public Sub(byte a, byte b) : base("SUB", a, b) {}
+
+        public override IState Apply (IState state) {
+            IState s1, s2;
+            var a = Op.GetOperand(A, state, out s1);
+            var b = Op.GetOperand(B, s1, out s2);
+            var diff = (uint)a - (uint)b;
+            return Op.SetOperand(A, (ushort)diff, s2).Set(RegisterName.O, (ushort)(diff >> 16));
+        }
+    }
 }

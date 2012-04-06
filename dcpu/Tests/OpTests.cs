@@ -49,6 +49,20 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
+        public void Sub_SubtractRegisterAndLiteral_RegisterHasCorrectValue() {
+            var state = new Sub(0x0, 0x25).Apply(new MutableState().Set(RegisterName.A, 10));
+            Assert.AreEqual(5, state.Get(RegisterName.A));
+            Assert.AreEqual(0, state.Get(RegisterName.O));
+        }
+
+        [Test]
+        public void Sub_SubtractRegisterAndLiteralWithOverflow_RegistersHaveCorrectValue() {
+            var state = new Sub(0x0, 0x25).Apply(new MutableState().Set(RegisterName.A, 3));
+            Assert.AreEqual(0xFFFE, state.Get(RegisterName.A));
+            Assert.AreEqual(0xFFFF, state.Get(RegisterName.O));
+        }
+
+        [Test]
         public void GetOperand_RegisterValue_ReturnsCorrectRegisterValue() {
             var prev = new MutableState();
             prev.Set(RegisterName.A, 34);
