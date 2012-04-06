@@ -63,6 +63,14 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
+        public void Mul_MultiplyRegisters_ResultAndOverflowAreCorrect() {
+            var prev = new MutableState().Set(RegisterName.A, 0x345).Set(RegisterName.B, 0x678);
+            var state = new Mul(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x2658, state.Get(RegisterName.A));
+            Assert.AreEqual(0x15, state.Get(RegisterName.O));
+        }
+
+        [Test]
         public void GetOperand_RegisterValue_ReturnsCorrectRegisterValue() {
             var prev = new MutableState();
             prev.Set(RegisterName.A, 34);

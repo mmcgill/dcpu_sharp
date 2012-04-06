@@ -238,4 +238,17 @@ namespace Com.MattMcGill.Dcpu {
             return Op.SetOperand(A, (ushort)diff, s2).Set(RegisterName.O, (ushort)(diff >> 16));
         }
     }
+
+    public class Mul : Op {
+        public Mul(byte a, byte b) : base("MUL", a, b) {}
+
+        public override IState Apply (IState state) {
+            IState s1, s2;
+            var a = Op.GetOperand(A, state, out s1);
+            var b = Op.GetOperand(B, s1, out s2);
+            var product = (uint)a * (uint)b;
+            var overflow = (ushort)((product >> 16) & 0xFFFF);
+            return Op.SetOperand(A, (ushort)product, s2).Set(RegisterName.O, overflow);
+        }
+    }
 }
