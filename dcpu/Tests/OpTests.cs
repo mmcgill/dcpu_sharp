@@ -6,6 +6,14 @@ namespace Com.MattMcGill.Dcpu.Tests
     public class OpTests {
 
         [Test]
+        public void Decode_BasicOpcodeIsDecodedCorrectly() {
+            var op = Op.Decode(0x7C01);
+            Assert.IsTrue(op is Set);
+            Assert.AreEqual(0x00, op.A);
+            Assert.AreEqual(0x1f, op.B);
+        }
+
+        [Test]
         public void Set_SetRegisterToLiteral_RegisterHasCorrectValue() {
             var prev = new MutableState();
             var next = new Set(0x0, 0x25).Apply(prev);

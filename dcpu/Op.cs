@@ -209,6 +209,23 @@ namespace Com.MattMcGill.Dcpu {
             return string.Format ("{0} {1}, {2}", _name, Op.OperandString(A), Op.OperandString(B));
         }
 
+        public static Op Decode(ushort word) {
+            byte opcode = (byte)(word & 0xF);
+            if (opcode == 0) {
+                throw new NotImplementedException();
+            }
+            byte a = (byte)((word >> 4) & 0x3F);
+            byte b = (byte)((word >> 10) & 0x3F);
+            switch (opcode) {
+                case 0x01: return new Set(a, b);
+                case 0x02: return new Add(a, b);
+                case 0x03: return new Sub(a, b);
+                case 0x04: return new Mul(a, b);
+                case 0x05: return new Div(a, b);
+                default: throw new NotImplementedException();
+            }
+        }
+
     }
 
     public class Set : Op {
