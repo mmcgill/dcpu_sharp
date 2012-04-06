@@ -13,6 +13,14 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
+        public void Set_OperandAIsPush_ValueArrivesAtCorrectLocationAndSPIsUpdated() {
+            var prev = new MutableState().Set(RegisterName.SP, 1);
+            var next = new Set(0x1a, 0x23).Apply(prev);
+            Assert.AreEqual(0x3, next.Get((ushort)0));
+            Assert.AreEqual(0, next.Get(RegisterName.SP));
+        }
+
+        [Test]
         public void Add_AddLiteralToRegister_RegisterHasCorrectSum() {
             var prev = new MutableState().Set(RegisterName.A, 14);
             var next = new Add(0x0, 0x25).Apply(prev);

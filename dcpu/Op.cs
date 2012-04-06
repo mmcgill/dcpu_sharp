@@ -23,6 +23,12 @@ namespace Com.MattMcGill.Dcpu {
             B = b;
         }
 
+        protected void LoadOperands(ref IState state, out ushort a, out ushort b) {
+            IState s1;
+            a = Op.GetOperand(A, state, out s1);
+            b = Op.GetOperand(B, s1, out state);
+        }
+
         public abstract IState Apply(IState state);
 
         /// <summary>
@@ -219,11 +225,9 @@ namespace Com.MattMcGill.Dcpu {
         public Add(byte a, byte b) : base("ADD", a, b) {}
 
         public override IState Apply (IState state) {
-            IState s1, s2;
-            var a = Op.GetOperand(A, state, out s1);
-            var b = Op.GetOperand(B, s1, out s2);
+            ushort a, b; LoadOperands(ref state, out a, out b);
             var sum = (uint)a + (uint)b;
-            return Op.SetOperand(A, (ushort)sum, s2).Set(RegisterName.O, (ushort)(sum >> 16));
+            return Op.SetOperand(A, (ushort)sum, state).Set(RegisterName.O, (ushort)(sum >> 16));
         }
     }
 
@@ -231,11 +235,9 @@ namespace Com.MattMcGill.Dcpu {
         public Sub(byte a, byte b) : base("SUB", a, b) {}
 
         public override IState Apply (IState state) {
-            IState s1, s2;
-            var a = Op.GetOperand(A, state, out s1);
-            var b = Op.GetOperand(B, s1, out s2);
+            ushort a, b; LoadOperands(ref state, out a, out b);
             var diff = (uint)a - (uint)b;
-            return Op.SetOperand(A, (ushort)diff, s2).Set(RegisterName.O, (ushort)(diff >> 16));
+            return Op.SetOperand(A, (ushort)diff, state).Set(RegisterName.O, (ushort)(diff >> 16));
         }
     }
 
@@ -243,12 +245,10 @@ namespace Com.MattMcGill.Dcpu {
         public Mul(byte a, byte b) : base("MUL", a, b) {}
 
         public override IState Apply (IState state) {
-            IState s1, s2;
-            var a = Op.GetOperand(A, state, out s1);
-            var b = Op.GetOperand(B, s1, out s2);
+            ushort a, b; LoadOperands(ref state, out a, out b);
             var product = (uint)a * (uint)b;
             var overflow = (ushort)((product >> 16) & 0xFFFF);
-            return Op.SetOperand(A, (ushort)product, s2).Set(RegisterName.O, overflow);
+            return Op.SetOperand(A, (ushort)product, state).Set(RegisterName.O, overflow);
         }
     }
 
@@ -256,12 +256,10 @@ namespace Com.MattMcGill.Dcpu {
         public Div(byte a, byte b) : base("DIV", a, b) {}
 
         public override IState Apply (IState state) {
-            IState s1, s2;
-            var a = Op.GetOperand(A, state, out s1);
-            var b = Op.GetOperand(B, s1, out s2);
+            ushort a, b; LoadOperands(ref state, out a, out b);
             var product = b == 0 ? (uint)0 : (uint)a / (uint)b;
             var overflow = b == 0 ? (ushort)0 : (ushort)(((a << 16) / (uint)b) & 0xFFFF);
-            return Op.SetOperand(A, (ushort)product, s2).Set(RegisterName.O, overflow);
+            return Op.SetOperand(A, (ushort)product, state).Set(RegisterName.O, overflow);
         }
     }
 }
