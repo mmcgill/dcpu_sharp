@@ -15,6 +15,14 @@ namespace Com.MattMcGill.Dcpu {
         /// </summary>
         public byte B { get; private set; }
 
+        private string _name;
+
+        protected Op (string name, byte a, byte b) {
+            _name = name;
+            A = a;
+            B = b;
+        }
+
         public abstract IState Apply(IState state);
 
         /// <summary>
@@ -148,6 +156,51 @@ namespace Com.MattMcGill.Dcpu {
                 return state.Set (RegisterName.PC, (ushort)(addr + 1));
             }
             throw new ArgumentException("Invalid operand " + operand);
+        }
+
+        public static string OperandString( byte operand ) {
+            if (0x0 <= operand && operand < 0x8) { // register
+                return ((RegisterName)operand).ToString();
+            }
+            if (0x8 <= operand && operand < 0x10) { // [register]
+                return "[" + ((RegisterName)(operand - 0x8)).ToString() + "]";
+            }
+            if (0x10 <= operand && operand < 0x18) { // [next word + register]
+                var reg = (RegisterName)(operand - 0x10);
+                return "[" + "PC++ + " + reg + "]";
+            }
+            if (operand == 0x18) { // [SP++]
+                return "[SP++]";
+            }
+            if (operand == 0x19) { // [SP]
+                return "[SP]";
+            }
+            if (operand == 0x1a) { // [--SP]
+                return "[--SP]";
+            }
+            if (operand == 0x1b) { // SP
+                return "SP";
+            }
+            if (operand == 0x1c) { // PC
+                return "PC";
+            }
+            if (operand == 0x1d) { // O
+                return "O";
+            }
+            if (operand == 0x1e) { // [next word]
+                return "[PC++]";
+            }
+            if (operand == 0x1f) { // next word
+                return "PC++";
+            }
+            if (0x20 <= operand && operand < 0x40) { // literal
+                return ((ushort)(operand - 0x20)).ToString();
+            }
+            throw new ArgumentException("Invalid operand " + operand);
+        }
+
+        public override string ToString () {
+            return string.Format ("{0} {1}, {2}", _name, Op.OperandString(A), Op.OperandString(B));
         }
 
     }
