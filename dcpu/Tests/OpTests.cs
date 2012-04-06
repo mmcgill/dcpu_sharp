@@ -71,6 +71,22 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
+        public void Div_DivideRegiters_ResultAndOverflowAreCorrect() {
+            var prev = new MutableState().Set(RegisterName.A, 3).Set(RegisterName.B, 2);
+            var state = new Div(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x1, state.Get(RegisterName.A));
+            Assert.AreEqual(0x8000, state.Get(RegisterName.O));
+        }
+
+        [Test]
+        public void Div_DivisorIsZero_ResultAndOverflowAreZero() {
+            var prev = new MutableState().Set(RegisterName.A, 1);
+            var state = new Div(0x0, 0x20).Apply(prev);
+            Assert.AreEqual(0x0, state.Get(RegisterName.A));
+            Assert.AreEqual(0x0, state.Get(RegisterName.O));
+        }
+
+        [Test]
         public void GetOperand_RegisterValue_ReturnsCorrectRegisterValue() {
             var prev = new MutableState();
             prev.Set(RegisterName.A, 34);
