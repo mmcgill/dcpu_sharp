@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,11 +28,13 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         public IState Set(RegisterName reg, ushort value) {
+            Trace.WriteLine(string.Format("  {0} <- {1}", reg, value));
             _regs[(int)reg] = value;
             return this;
         }
 
         public IState Set(ushort addr, ushort value) {
+            Trace.WriteLine(string.Format("  [0x{0:X}] <- {1}", addr, value));
             _memory[addr] = value;
             return this;
         }
