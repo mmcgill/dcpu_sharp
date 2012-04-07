@@ -29,6 +29,9 @@ namespace Com.MattMcGill.Dcpu {
                 case 0x06: return new Mod(a, b);
                 case 0x07: return new Shl(a, b);
                 case 0x08: return new Shr(a, b);
+                case 0x09: return new And(a, b);
+                case 0x0a: return new Bor(a, b);
+                case 0x0b: return new Xor(a, b);
                 default: throw new NotImplementedException();
             }
         }

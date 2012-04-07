@@ -120,4 +120,31 @@ namespace Com.MattMcGill.Dcpu {
             return Dcpu.SetOperand(A, result, state).Set(Register.O, underflow);
         }
     }
+
+    public class And : Op {
+        public And(byte a, byte b) : base("AND", a, b) {}
+
+        public override IState Apply(IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            return Dcpu.SetOperand(A, (ushort)(a & b), state);
+        }
+    }
+
+    public class Bor : Op {
+        public Bor(byte a, byte b) : base("BOR", a, b) {}
+
+        public override IState Apply(IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            return Dcpu.SetOperand(A, (ushort)(a | b), state);
+        }
+    }
+
+    public class Xor : Op {
+        public Xor(byte a, byte b) : base("XOR", a, b) {}
+
+        public override IState Apply(IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            return Dcpu.SetOperand(A, (ushort)(a ^ b), state);
+        }
+    }
 }

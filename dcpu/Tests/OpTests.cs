@@ -143,5 +143,26 @@ namespace Com.MattMcGill.Dcpu.Tests
             Assert.AreEqual(0x0345, state.Get(Register.A));
             Assert.AreEqual(0x6, state.Get(Register.O));
         }
+
+        [Test]
+        public void And_RegisterOperands_ResultIsCorrect() {
+            var prev = new MutableState().Set(Register.A, 6).Set(Register.B, 5);
+            var state = new And(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x04, state.Get(Register.A));
+        }
+
+        [Test]
+        public void Bor_RegisterOperands_ResultIsCorrect() {
+            var prev = new MutableState().Set(Register.A, 6).Set(Register.B, 5);
+            var state = new Bor(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x7, state.Get(Register.A));
+        }
+
+        [Test]
+        public void Xor_RegisterOperands_ResultIsCorrect() {
+            var prev = new MutableState().Set(Register.A, 6).Set(Register.B, 5);
+            var state = new Xor(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x3, state.Get(Register.A));
+        }
     }
 }
