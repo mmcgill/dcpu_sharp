@@ -16,7 +16,7 @@ namespace Com.MattMcGill.Dcpu {
         /// </summary>
         /// <param name="reg">a register name</param>
         /// <returns>value of reg</returns>
-        ushort Get(RegisterName reg);
+        ushort Get(Register reg);
 
         /// <summary>
         /// Get the word at the given address.
@@ -31,7 +31,7 @@ namespace Com.MattMcGill.Dcpu {
         /// <param name="reg">a register name</param>
         /// <param name="value">the new value</param>
         /// <returns>the state obtained by setting reg to value</returns>
-        IState Set(RegisterName reg, ushort value);
+        IState Set(Register reg, ushort value);
 
         /// <summary>
         /// Set the word at the given address.

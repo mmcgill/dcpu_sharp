@@ -53,7 +53,7 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply (IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var sum = (uint)a + (uint)b;
-            return Dcpu.SetOperand(A, (ushort)sum, state).Set(RegisterName.O, (ushort)(sum >> 16));
+            return Dcpu.SetOperand(A, (ushort)sum, state).Set(Register.O, (ushort)(sum >> 16));
         }
     }
 
@@ -63,7 +63,7 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply (IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var diff = (uint)a - (uint)b;
-            return Dcpu.SetOperand(A, (ushort)diff, state).Set(RegisterName.O, (ushort)(diff >> 16));
+            return Dcpu.SetOperand(A, (ushort)diff, state).Set(Register.O, (ushort)(diff >> 16));
         }
     }
 
@@ -74,7 +74,7 @@ namespace Com.MattMcGill.Dcpu {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var product = (uint)a * (uint)b;
             var overflow = (ushort)((product >> 16) & 0xFFFF);
-            return Dcpu.SetOperand(A, (ushort)product, state).Set(RegisterName.O, overflow);
+            return Dcpu.SetOperand(A, (ushort)product, state).Set(Register.O, overflow);
         }
     }
 
@@ -85,7 +85,7 @@ namespace Com.MattMcGill.Dcpu {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var product = b == 0 ? (uint)0 : (uint)a / (uint)b;
             var overflow = b == 0 ? (ushort)0 : (ushort)(((a << 16) / (uint)b) & 0xFFFF);
-            return Dcpu.SetOperand(A, (ushort)product, state).Set(RegisterName.O, overflow);
+            return Dcpu.SetOperand(A, (ushort)product, state).Set(Register.O, overflow);
         }
     }
 }

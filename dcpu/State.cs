@@ -19,7 +19,7 @@ namespace Com.MattMcGill.Dcpu {
             _regs = new ushort[11];
         }
 
-        public ushort Get(RegisterName reg) {
+        public ushort Get(Register reg) {
             return _regs[(int)reg];
         }
 
@@ -27,7 +27,7 @@ namespace Com.MattMcGill.Dcpu {
             return _memory[addr];
         }
 
-        public IState Set(RegisterName reg, ushort value) {
+        public IState Set(Register reg, ushort value) {
             Trace.WriteLine(string.Format("  {0} <- {1}", reg, value));
             _regs[(int)reg] = value;
             return this;

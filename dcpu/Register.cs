@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Com.MattMcGill.Dcpu {
 
-    public enum RegisterName {
+    public enum Register {
         A = 0,
         B = 1,
         C = 2,
