@@ -50,7 +50,7 @@ namespace Com.MattMcGill.Dcpu {
     public class Add : Op {
         public Add(byte a, byte b) : base("ADD", a, b) {}
 
-        public override IState Apply (IState state) {
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var sum = (uint)a + (uint)b;
             return Dcpu.SetOperand(A, (ushort)sum, state).Set(Register.O, (ushort)(sum >> 16));
@@ -60,7 +60,7 @@ namespace Com.MattMcGill.Dcpu {
     public class Sub : Op {
         public Sub(byte a, byte b) : base("SUB", a, b) {}
 
-        public override IState Apply (IState state) {
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var diff = (uint)a - (uint)b;
             return Dcpu.SetOperand(A, (ushort)diff, state).Set(Register.O, (ushort)(diff >> 16));
@@ -70,7 +70,7 @@ namespace Com.MattMcGill.Dcpu {
     public class Mul : Op {
         public Mul(byte a, byte b) : base("MUL", a, b) {}
 
-        public override IState Apply (IState state) {
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var product = (uint)a * (uint)b;
             var overflow = (ushort)((product >> 16) & 0xFFFF);
@@ -81,7 +81,7 @@ namespace Com.MattMcGill.Dcpu {
     public class Div : Op {
         public Div(byte a, byte b) : base("DIV", a, b) {}
 
-        public override IState Apply (IState state) {
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             var product = b == 0 ? (uint)0 : (uint)a / (uint)b;
             var overflow = b == 0 ? (ushort)0 : (ushort)(((a << 16) / (uint)b) & 0xFFFF);
@@ -92,9 +92,20 @@ namespace Com.MattMcGill.Dcpu {
     public class Mod : Op {
         public Mod(byte a, byte b) : base("MOD", a, b) {}
 
-        public override IState Apply (IState state) {
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             return Dcpu.SetOperand(A, b == 0 ? (ushort)0 : (ushort)(a % b), state);
+        }
+    }
+
+    public class Shl : Op {
+        public Shl(byte a, byte b) : base("SHL", a, b) {}
+
+        public override IState Apply(IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            var overflowShift = 16 - (b % 16);
+            var result = (ushort)(a << (b % 16));
+            return Dcpu.SetOperand(A, result, state).Set(Register.O, (ushort)(a >> overflowShift));
         }
     }
 }

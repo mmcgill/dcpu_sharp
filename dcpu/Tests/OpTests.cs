@@ -107,5 +107,23 @@ namespace Com.MattMcGill.Dcpu.Tests
             var state = new Mod(0x0, 0x1).Apply(prev);
             Assert.AreEqual(0x0, state.Get(Register.A));
         }
+
+        [Test]
+        public void Shl_RegisterAndLiteral_ResultAndOverflowAreCorrect() {
+            var prev = new MutableState().Set(Register.A, 0x5201);
+            var state = new Shl(0x0, 0x24).Apply(prev);
+            Assert.AreEqual(0x2010, state.Get(Register.A));
+            Assert.AreEqual(0x5, state.Get(Register.O));
+        }
+
+        [Test]
+        public void Shl_SecondOperandGreaterThan15_ShiftPerformedModulo16() {
+            // TODO: Get clarification on the DCPU spec that this is actually
+            // TODO: how shifts should work.
+            var prev = new MutableState().Set(Register.A, 0x1234).Set(Register.B, 20);
+            var state = new Shl(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x2340, state.Get(Register.A));
+            Assert.AreEqual(0x0001, state.Get(Register.O));
+        }
     }
 }

@@ -26,7 +26,8 @@ namespace Com.MattMcGill.Dcpu {
                 case 0x03: return new Sub(a, b);
                 case 0x04: return new Mul(a, b);
                 case 0x05: return new Div(a, b);
-                case 0x06 : return new Mod(a, b);
+                case 0x06: return new Mod(a, b);
+                case 0x07: return new Shl(a, b);
                 default: throw new NotImplementedException();
             }
         }
