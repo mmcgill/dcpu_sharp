@@ -88,4 +88,13 @@ namespace Com.MattMcGill.Dcpu {
             return Dcpu.SetOperand(A, (ushort)product, state).Set(Register.O, overflow);
         }
     }
+
+    public class Mod : Op {
+        public Mod(byte a, byte b) : base("MOD", a, b) {}
+
+        public override IState Apply (IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            return Dcpu.SetOperand(A, b == 0 ? (ushort)0 : (ushort)(a % b), state);
+        }
+    }
 }

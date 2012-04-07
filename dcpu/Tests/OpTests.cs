@@ -79,7 +79,7 @@ namespace Com.MattMcGill.Dcpu.Tests
         }
 
         [Test]
-        public void Div_DivideRegiters_ResultAndOverflowAreCorrect() {
+        public void Div_DivideRegisters_ResultAndOverflowAreCorrect() {
             var prev = new MutableState().Set(Register.A, 3).Set(Register.B, 2);
             var state = new Div(0x0, 0x1).Apply(prev);
             Assert.AreEqual(0x1, state.Get(Register.A));
@@ -92,6 +92,20 @@ namespace Com.MattMcGill.Dcpu.Tests
             var state = new Div(0x0, 0x20).Apply(prev);
             Assert.AreEqual(0x0, state.Get(Register.A));
             Assert.AreEqual(0x0, state.Get(Register.O));
+        }
+
+        [Test]
+        public void Mod_ModWithRegisters_ResultIsCorrect() {
+            var prev = new MutableState().Set(Register.A, 3).Set(Register.B, 2);
+            var state = new Mod(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x1, state.Get(Register.A));
+        }
+
+        [Test]
+        public void Mod_SecondOperandIsZero_ResultIsZero() {
+            var prev = new MutableState().Set(Register.A, 3).Set(Register.B, 0);
+            var state = new Mod(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0x0, state.Get(Register.A));
         }
     }
 }
