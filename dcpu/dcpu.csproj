@@ -55,6 +55,8 @@
     <Compile Include="Register.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Tests\OpTests.cs" />
+    <Compile Include="Dcpu.cs" />
+    <Compile Include="Tests\DcpuTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
