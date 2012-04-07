@@ -4,7 +4,7 @@ namespace Com.MattMcGill.Dcpu {
     /// <summary>
     /// Basic functionality common to DCPU operations.
     /// </summary>
-    public abstract class Op : IOp {
+    public abstract class Op {
         /// <summary>
         /// 6-bit A operand (2 high-order bits must be 0).
         /// </summary>

@@ -47,7 +47,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IOp.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Program.cs" />
