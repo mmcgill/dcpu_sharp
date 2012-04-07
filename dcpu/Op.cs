@@ -108,4 +108,16 @@ namespace Com.MattMcGill.Dcpu {
             return Dcpu.SetOperand(A, result, state).Set(Register.O, (ushort)(a >> overflowShift));
         }
     }
+
+    public class Shr : Op {
+        public Shr(byte a, byte b) : base("SHR", a, b) {}
+
+        public override IState Apply(IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            var shift = b % 16;
+            var underflow = (ushort)(a & ((ushort)Math.Pow(2, shift) - 1));
+            var result = (ushort)(a >> shift);
+            return Dcpu.SetOperand(A, result, state).Set(Register.O, underflow);
+        }
+    }
 }
