@@ -3,7 +3,7 @@
 namespace Com.MattMcGill.Dcpu.Tests
 {
     [TestFixture]
-    public class OpTests {
+    public class BasicOpTest {
 
         [Test]
         public void Set_SetRegisterToLiteral_RegisterHasCorrectValue() {

@@ -4,7 +4,7 @@ namespace Com.MattMcGill.Dcpu {
     /// <summary>
     /// Basic functionality common to DCPU operations.
     /// </summary>
-    public abstract class Op {
+    public abstract class BasicOp {
         /// <summary>
         /// 6-bit A operand (2 high-order bits must be 0).
         /// </summary>
@@ -17,7 +17,7 @@ namespace Com.MattMcGill.Dcpu {
 
         private string _name;
 
-        protected Op (string name, byte a, byte b) {
+        protected BasicOp (string name, byte a, byte b) {
             _name = name;
             A = a;
             B = b;
@@ -37,7 +37,7 @@ namespace Com.MattMcGill.Dcpu {
 
     }
 
-    public class Set : Op {
+    public class Set : BasicOp {
         public Set(byte a, byte b) : base("SET", a, b) {}
 
         public override IState Apply (IState state) {
@@ -47,7 +47,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Add : Op {
+    public class Add : BasicOp {
         public Add(byte a, byte b) : base("ADD", a, b) {}
 
         public override IState Apply(IState state) {
@@ -57,7 +57,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Sub : Op {
+    public class Sub : BasicOp {
         public Sub(byte a, byte b) : base("SUB", a, b) {}
 
         public override IState Apply(IState state) {
@@ -67,7 +67,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Mul : Op {
+    public class Mul : BasicOp {
         public Mul(byte a, byte b) : base("MUL", a, b) {}
 
         public override IState Apply(IState state) {
@@ -78,7 +78,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Div : Op {
+    public class Div : BasicOp {
         public Div(byte a, byte b) : base("DIV", a, b) {}
 
         public override IState Apply(IState state) {
@@ -89,7 +89,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Mod : Op {
+    public class Mod : BasicOp {
         public Mod(byte a, byte b) : base("MOD", a, b) {}
 
         public override IState Apply(IState state) {
@@ -98,7 +98,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Shl : Op {
+    public class Shl : BasicOp {
         public Shl(byte a, byte b) : base("SHL", a, b) {}
 
         public override IState Apply(IState state) {
@@ -109,7 +109,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Shr : Op {
+    public class Shr : BasicOp {
         public Shr(byte a, byte b) : base("SHR", a, b) {}
 
         public override IState Apply(IState state) {
@@ -121,7 +121,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class And : Op {
+    public class And : BasicOp {
         public And(byte a, byte b) : base("AND", a, b) {}
 
         public override IState Apply(IState state) {
@@ -130,7 +130,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Bor : Op {
+    public class Bor : BasicOp {
         public Bor(byte a, byte b) : base("BOR", a, b) {}
 
         public override IState Apply(IState state) {
@@ -139,7 +139,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Xor : Op {
+    public class Xor : BasicOp {
         public Xor(byte a, byte b) : base("XOR", a, b) {}
 
         public override IState Apply(IState state) {
@@ -148,7 +148,7 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public abstract class If : Op {
+    public abstract class If : BasicOp {
         public If(string name, byte a, byte b) : base(name, a, b) {}
         public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);

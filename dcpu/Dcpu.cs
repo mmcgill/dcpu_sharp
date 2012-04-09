@@ -17,7 +17,7 @@ namespace Com.MattMcGill.Dcpu {
             return word;
         }
 
-        public static Op Decode(ushort word) {
+        public static BasicOp Decode(ushort word) {
             byte opcode = (byte)(word & 0xF);
             if (opcode == 0) {
                 throw new NotImplementedException();
