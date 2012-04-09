@@ -64,11 +64,8 @@ namespace Com.MattMcGill.Dcpu {
                 return prev.Get(prev.Get((Register) (operand & 0x07)));
             }
             if (16 <= operand && operand < 24) { // [next word + register]
-                var pc = (ushort) (prev.Get(Register.PC) + 1);
-                var addr = (ushort) (prev.Get(pc) + prev.Get((Register) (operand & 0x07)));
-                var result = prev.Get(addr);
-                next = prev.Set(Register.PC, pc);
-                return result;
+                var addr = (ushort)(prev.Get((Register) (operand & 0x07)) + Fetch(prev, out next));
+                return next.Get(addr);
             }
             if (operand == 0x18) { // [SP++]
                 var addr = prev.Get(Register.SP);
@@ -95,16 +92,11 @@ namespace Com.MattMcGill.Dcpu {
                 return prev.Get(Register.O);
             }
             if (operand == 0x1e) { // [next word]
-                var addr = prev.Get(Register.PC);
-                var result = prev.Get(prev.Get(addr));
-                next = prev.Set(Register.PC, (ushort)(addr + 1));
-                return result;
+                var addr = Fetch(prev, out next);
+                return next.Get(addr);
             }
             if (operand == 0x1f) { // next literal
-                var addr = prev.Get(Register.PC);
-                var result = prev.Get(addr);
-                next = prev.Set(Register.PC, (ushort)(addr + 1));
-                return result;
+                return Fetch(prev, out next);
             }
             if (0x20 <= operand && operand < 0x40) { // literal
                 return (ushort)(operand - 0x20);
@@ -132,11 +124,10 @@ namespace Com.MattMcGill.Dcpu {
                 return state.Set(addr, value);
             }
             if (0x10 <= operand && operand < 0x18) { // [next word + register]
-                var pc = state.Get(Register.PC);
-                var addr = state.Get(pc);
-                var offset = state.Get((Register)(operand - 0x10));
-                return state.Set(Register.PC, (ushort)(pc + 1))
-                            .Set((ushort)(addr + offset), value);
+                IState next;
+                var addr = Fetch(state, out next);
+                addr += next.Get((Register)(operand - 0x10));
+                return next.Set(addr, value);
             }
             if (operand == 0x18) { // [SP++]
                 var addr = state.Get(Register.SP);
@@ -159,12 +150,14 @@ namespace Com.MattMcGill.Dcpu {
                 return state.Set(Register.O, value);
             }
             if (operand == 0x1e) { // [next word]
-                var addr = state.Get(Register.PC);
-                return state.Set(addr, value).Set(Register.PC, (ushort)(addr + 1));
+                IState next;
+                var addr = Fetch(state, out next);
+                return next.Set(addr, value);
             }
             if (operand == 0x1f) { // next word
-                var addr = state.Get(Register.PC);
-                return state.Set(Register.PC, (ushort)(addr + 1));
+                IState next;
+                Fetch(state, out next);
+                return next;
             }
             if (0x20 <= operand && operand < 0x40) { // literal
                 var addr = state.Get (Register.PC);

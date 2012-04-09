@@ -66,7 +66,7 @@ namespace Com.MattMcGill.Dcpu {
         public void GetOperand_IndirectAddressPlusRegister_ReturnsCorrectValueFromMemory() {
             var prev = new MutableState();
             prev.Set(Register.Z, 10);
-            prev.Set(1, 10);
+            prev.Set((ushort)0, 10);
             prev.Set(20, 42);
             IState next;
 
@@ -274,10 +274,10 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         [Test]
-        public void SetOperand_NextWord_SetsValueAtAddrInPC() {
-            var prev = new MutableState().Set(Register.PC, 22);
+        public void SetOperand_NextWord_SetsValueAtAddrOfValueAtPC() {
+            var prev = new MutableState().Set(Register.PC, 22).Set(22, 10);
 
-            Assert.AreEqual(99, Dcpu.SetOperand(0x1e, 99, prev).Get(22));
+            Assert.AreEqual(99, Dcpu.SetOperand(0x1e, 99, prev).Get(10));
         }
 
         [Test]
