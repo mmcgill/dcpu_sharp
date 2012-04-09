@@ -169,6 +169,27 @@ namespace Com.MattMcGill.Dcpu {
             throw new ArgumentException("Invalid operand " + operand);
         }
 
+        /// <summary>
+        /// Skip the operand, incrementing the PC if the operand involves the next word.
+        /// </summary>
+        /// <param name='operand'>
+        /// the operand code
+        /// </param>
+        /// <param name='state'>
+        /// the current state
+        /// </param>
+        /// <returns>
+        /// the state after skipping the operand
+        /// </returns>
+        public static IState SkipOperand( byte operand, IState state) {
+            if ((0x10 <= operand && operand < 0x18) || operand == 0x1e || operand == 0x1f) {
+                var pc = state.Get(Register.PC);
+                return state.Set(Register.PC, (ushort)(pc + 1));
+            } else {
+                return state;
+            }
+        }
+
         public static string OperandString( byte operand ) {
             if (0x0 <= operand && operand < 0x8) { // register
                 return ((Register)operand).ToString();
