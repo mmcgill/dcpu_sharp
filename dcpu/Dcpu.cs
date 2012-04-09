@@ -4,13 +4,17 @@ namespace Com.MattMcGill.Dcpu {
     public static class Dcpu {
 
         public static IState ExecuteInstruction(IState state) {
-            var addr = state.Get(Register.PC);
-            var opcode = state.Get(addr);
-            state = state.Set(Register.PC, (ushort)(addr + 1));
-
+            IState after;
+            var opcode = Fetch(state, out after);
             var op = Decode(opcode);
+            return op.Apply(after);
+        }
 
-            return op.Apply(state);
+        public static ushort Fetch(IState before, out IState after) {
+            var addr = before.Get(Register.PC);
+            var word = before.Get(addr);
+            after = before.Set(Register.PC, (ushort)(addr + 1));
+            return word;
         }
 
         public static Op Decode(ushort word) {
@@ -181,7 +185,7 @@ namespace Com.MattMcGill.Dcpu {
         /// <returns>
         /// the state after skipping the operand
         /// </returns>
-        public static IState SkipOperand( byte operand, IState state) {
+        public static IState SkipOperand(byte operand, IState state) {
             if ((0x10 <= operand && operand < 0x18) || operand == 0x1e || operand == 0x1f) {
                 var pc = state.Get(Register.PC);
                 return state.Set(Register.PC, (ushort)(pc + 1));

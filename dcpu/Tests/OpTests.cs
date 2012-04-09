@@ -164,5 +164,22 @@ namespace Com.MattMcGill.Dcpu.Tests
             var state = new Xor(0x0, 0x1).Apply(prev);
             Assert.AreEqual(0x3, state.Get(Register.A));
         }
+
+        [Test]
+        public void Ife_RegisterOperandsAreEqual_PCIsNotUpdated() {
+            var prev = new MutableState().Set(Register.A, 1).Set(Register.B, 1);
+            var state = new Ife(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ife_RegisterOperandsAreNotEqual_PCSkipsNextInstructionAndOperands() {
+            var prev = new MutableState()
+                .Set(Register.A, 1).Set(Register.B, 2)
+                .Set((ushort)0, 0x7C02)
+                .Set((ushort)1, 0x002A);
+            var state = new Ife(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(2, state.Get(Register.PC));
+        }
     }
 }

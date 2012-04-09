@@ -147,4 +147,18 @@ namespace Com.MattMcGill.Dcpu {
             return Dcpu.SetOperand(A, (ushort)(a ^ b), state);
         }
     }
+
+    public class Ife : Op {
+        public Ife(byte a, byte b) : base("IFE", a, b) {}
+
+        public override IState Apply (IState state) {
+            ushort a, b; LoadOperands(ref state, out a, out b);
+            if (a != b) {
+                IState s1;
+                var nextOp = Dcpu.Decode(Dcpu.Fetch(state, out s1));
+                return Dcpu.SkipOperand(nextOp.B, Dcpu.SkipOperand(nextOp.A, s1));
+            }
+            return state;
+        }
+    }
 }
