@@ -148,17 +148,37 @@ namespace Com.MattMcGill.Dcpu {
         }
     }
 
-    public class Ife : Op {
-        public Ife(byte a, byte b) : base("IFE", a, b) {}
-
-        public override IState Apply (IState state) {
+    public abstract class If : Op {
+        public If(string name, byte a, byte b) : base(name, a, b) {}
+        public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
-            if (a != b) {
+            if (IsNextSkipped(a, b)) {
                 IState s1;
                 var nextOp = Dcpu.Decode(Dcpu.Fetch(state, out s1));
                 return Dcpu.SkipOperand(nextOp.B, Dcpu.SkipOperand(nextOp.A, s1));
             }
             return state;
         }
+        protected abstract bool IsNextSkipped(ushort a, ushort b);
+    }
+
+    public class Ife : If {
+        public Ife(byte a, byte b) : base("IFE", a, b) {}
+        protected override bool IsNextSkipped (ushort a, ushort b) { return a != b; }
+    }
+
+    public class Ifn : If {
+        public Ifn(byte a, byte b) : base("IFN", a, b) {}
+        protected override bool IsNextSkipped (ushort a, ushort b) { return a == b; }
+    }
+
+    public class Ifg : If {
+        public Ifg(byte a, byte b) : base("IFG", a, b) {}
+        protected override bool IsNextSkipped (ushort a, ushort b) { return a <= b; }
+    }
+
+    public class Ifb : If {
+        public Ifb(byte a, byte b) : base("IFB", a, b) {}
+        protected override bool IsNextSkipped (ushort a, ushort b) { return (a & b) == 0; }
     }
 }

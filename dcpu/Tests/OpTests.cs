@@ -181,5 +181,56 @@ namespace Com.MattMcGill.Dcpu.Tests
             var state = new Ife(0x0, 0x1).Apply(prev);
             Assert.AreEqual(2, state.Get(Register.PC));
         }
+
+        [Test]
+        public void Ifn_RegisterOperandsAreNotEqual_PCIsNotUpdated() {
+            var prev = new MutableState().Set(Register.A, 1).Set(Register.B, 2);
+            var state = new Ifn(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ifn_RegisterOperandsAreEqual_PCSkipsNextInstructionAndOperands() {
+            var prev = new MutableState()
+                .Set(Register.A, 1).Set(Register.B, 1)
+                .Set((ushort)0, 0x7C02)
+                .Set((ushort)1, 0x002A);
+            var state = new Ifn(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(2, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ifg_FirstOperandGreater_PCIsNotUpdated() {
+            var prev = new MutableState().Set(Register.A, 2).Set(Register.B, 1);
+            var state = new Ifg(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ifg_FirstOperandNotGreater_PCSkipsNextInstructionAndOperands() {
+            var prev = new MutableState()
+                .Set(Register.A, 1).Set(Register.B, 1)
+                .Set((ushort)0, 0x7C02)
+                .Set((ushort)1, 0x002A);
+            var state = new Ifg(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(2, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ifb_AndOfOperandsIsNonZero_PCIsNotUpdated() {
+            var prev = new MutableState().Set(Register.A, 3).Set(Register.B, 1);
+            var state = new Ifb(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(0, state.Get(Register.PC));
+        }
+
+        [Test]
+        public void Ifb_AndOfOperandsIsZero_PCSkipsNextInstructionAndOperands() {
+            var prev = new MutableState()
+                .Set(Register.A, 4).Set(Register.B, 2)
+                .Set((ushort)0, 0x7C02)
+                .Set((ushort)1, 0x002A);
+            var state = new Ifb(0x0, 0x1).Apply(prev);
+            Assert.AreEqual(2, state.Get(Register.PC));
+        }
     }
 }
