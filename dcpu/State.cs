@@ -1,8 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Com.MattMcGill.Dcpu {
 
@@ -37,6 +35,21 @@ namespace Com.MattMcGill.Dcpu {
             Trace.WriteLine(string.Format("  [0x{0:X}] <- {1}", addr, value));
             _memory[addr] = value;
             return this;
+        }
+
+        public static MutableState ReadFromFile(string path) {
+            var state = new MutableState();
+            using (var objFileReader = new BinaryReader(new FileStream(path, FileMode.Open))) {
+                ushort i = 0;
+                try {
+                    while (true) {
+                        var msb = objFileReader.ReadByte();
+                        var lsb = objFileReader.ReadByte();
+                        state._memory[i++] = (ushort)((msb << 8) ^ lsb);
+                    }
+                } catch (EndOfStreamException) {}
+            }
+            return state;
         }
     }
 

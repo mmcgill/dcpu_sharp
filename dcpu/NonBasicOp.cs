@@ -4,25 +4,25 @@ namespace Com.MattMcGill.Dcpu {
     public abstract class NonBasicOp : Op {
         private string _name;
 
-        public byte A { get; private set; }
+        public Operand A { get; private set; }
 
-        protected NonBasicOp(string name, byte a) {
+        protected NonBasicOp(string name, Operand a) {
             _name = name;
             A = a;
         }
 
         public override string ToString() {
-            return string.Format("{0} {1}]", _name, A);
+            return string.Format("{0} {1}", _name, A);
         }
     }
 
     public class Jsr : NonBasicOp {
-        public Jsr(byte a) : base("JSR", a) {}
+        public Jsr(Operand a) : base("JSR", a) {}
 
         public override IState Apply(IState prev) {
-            IState s1, s2;
-            var jumpTarget = Dcpu.GetOperand(A, prev, out s1);
-            s2 = Dcpu.SetOperand(0x1a, s1.Get(Register.PC), s1);
+            IState s1;
+            var jumpTarget = A.Get(prev);
+            var s2 = Dcpu.GetOperand(0x1a, prev, out s1).Set(s1, prev.Get(Register.PC)); // SET PUSH, PC
             return s2.Set(Register.PC, jumpTarget);
         }
     }
