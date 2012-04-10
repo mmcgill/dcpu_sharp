@@ -56,6 +56,9 @@
     <Compile Include="Tests\DcpuTest.cs" />
     <Compile Include="BasicOp.cs" />
     <Compile Include="Tests\BasicOpTest.cs" />
+    <Compile Include="NonBasicOp.cs" />
+    <Compile Include="Tests\NonBasicOpTest.cs" />
+    <Compile Include="Op.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -20,7 +20,7 @@ namespace Com.MattMcGill.Dcpu {
 
         [Test]
         public void Decode_BasicOpcodeIsDecodedCorrectly() {
-            var op = Dcpu.Decode(0x7C01);
+            var op = (BasicOp)Dcpu.Decode(0x7C01);
             Assert.IsTrue(op is Set);
             Assert.AreEqual(0x00, op.A);
             Assert.AreEqual(0x1f, op.B);

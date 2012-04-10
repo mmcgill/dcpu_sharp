@@ -4,7 +4,7 @@ namespace Com.MattMcGill.Dcpu {
     /// <summary>
     /// Basic functionality common to DCPU operations.
     /// </summary>
-    public abstract class BasicOp {
+    public abstract class BasicOp : Op {
         /// <summary>
         /// 6-bit A operand (2 high-order bits must be 0).
         /// </summary>
@@ -28,8 +28,6 @@ namespace Com.MattMcGill.Dcpu {
             a = Dcpu.GetOperand(A, state, out s1);
             b = Dcpu.GetOperand(B, s1, out state);
         }
-
-        public abstract IState Apply(IState state);
 
         public override string ToString () {
             return string.Format ("{0} {1}, {2}", _name, Dcpu.OperandString(A), Dcpu.OperandString(B));
@@ -153,9 +151,7 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply(IState state) {
             ushort a, b; LoadOperands(ref state, out a, out b);
             if (IsNextSkipped(a, b)) {
-                IState s1;
-                var nextOp = Dcpu.Decode(Dcpu.Fetch(state, out s1));
-                return Dcpu.SkipOperand(nextOp.B, Dcpu.SkipOperand(nextOp.A, s1));
+                return Dcpu.Skip(state);
             }
             return state;
         }

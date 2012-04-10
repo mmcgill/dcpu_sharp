@@ -17,14 +17,12 @@ namespace Com.MattMcGill.Dcpu {
             return word;
         }
 
-        public static BasicOp Decode(ushort word) {
+        public static Op Decode(ushort word) {
             byte opcode = (byte)(word & 0xF);
-            if (opcode == 0) {
-                throw new NotImplementedException();
-            }
             byte a = (byte)((word >> 4) & 0x3F);
             byte b = (byte)((word >> 10) & 0x3F);
             switch (opcode) {
+                case 0x00: return DecodeNonBasic(word);
                 case 0x01: return new Set(a, b);
                 case 0x02: return new Add(a, b);
                 case 0x03: return new Sub(a, b);
@@ -37,6 +35,27 @@ namespace Com.MattMcGill.Dcpu {
                 case 0x0a: return new Bor(a, b);
                 case 0x0b: return new Xor(a, b);
                 default: throw new NotImplementedException();
+            }
+        }
+
+        private static NonBasicOp DecodeNonBasic(ushort word) {
+            var opcode = (byte)((word >> 4) & 0x3F);
+            var operandCode = (byte)((word >> 10) & 0x3F);
+            switch (opcode) {
+                case 0x01: return new Jsr(operandCode);
+                default: throw new NotImplementedException();
+            }
+        }
+
+        public static IState Skip(IState state) {
+            IState s1;
+            var nextOp = Dcpu.Decode(Dcpu.Fetch(state, out s1));
+            if (nextOp is BasicOp) {
+                var op = (BasicOp)nextOp;
+                return Dcpu.SkipOperand(op.B, Dcpu.SkipOperand(op.A, s1));
+            } else {
+                var op = (NonBasicOp)nextOp;
+                return Dcpu.SkipOperand(op.A, s1);
             }
         }
 
