@@ -31,7 +31,7 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private static void PrintUsage() {
-            Console.WriteLine("{0} <object file>", Environment.CommandLine[0]);
+            Console.WriteLine("dcpu <object file>", Environment.CommandLine[0]);
         }
     }
 }
