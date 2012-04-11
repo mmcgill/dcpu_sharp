@@ -62,4 +62,22 @@ namespace Com.MattMcGill.Dcpu {
             return _reg.ToString();
         }
     }
+
+	public class RegIndirect : Operand {
+		private Register _reg;
+
+		public RegIndirect(Register register) { _reg = register; }
+
+		public override ushort Get(IState state) {
+			return state.Get(state.Get(_reg));
+		}
+
+		public override IState Set(IState prev, ushort value) {
+			return prev.Set(prev.Get(_reg), value);
+		}
+
+        public override string ToString() {
+			return string.Format("[{0}]", _reg);
+		}
+	}
 }

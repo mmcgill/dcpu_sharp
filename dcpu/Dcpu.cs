@@ -79,7 +79,7 @@ namespace Com.MattMcGill.Dcpu {
                 return new Reg((Register)operand);
             }
             if (8 <= operand && operand < 16) { // [register]
-                return new Address(prev.Get((Register)(operand & 0x07)));
+                return new RegIndirect((Register)(operand & 0x07));
             }
             if (16 <= operand && operand < 24) { // [next word + register]
                 var addr = (ushort)(prev.Get((Register) (operand & 0x07)) + FetchNextWord(prev, out next));
