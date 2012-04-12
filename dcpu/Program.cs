@@ -17,16 +17,25 @@ namespace Com.MattMcGill.Dcpu {
 
             IState state = MutableState.ReadFromFile(args[0]);
             while (true) {
-                IState s1;
                 var pc = state.Get(Register.PC);
-                var op = Dcpu.FetchNextInstruction(state, out s1);
-                Trace.WriteLine(string.Format("[0x{0:X}] {1}", pc, op));
+
+                Trace.Write(string.Format("[0x{0:X}] ", pc));
+
+                var sp = state.Get(Register.SP);
+                var origSp = sp;
+                var op = Dcpu.FetchNextInstruction(state, ref pc, ref sp);
+
+                Trace.WriteLine(string.Format("{0}", op));
+
                 Console.Write("> ");
                 var input = Console.ReadLine().Trim();
                 if (input == "q") {
                     break;
                 }
-                state = op.Apply(s1);
+                state = state.Set(Register.PC, pc);
+                if (origSp != sp)
+                    state = state.Set(Register.SP, sp);
+                state = op.Apply(state);
             }
         }
 

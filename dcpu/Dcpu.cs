@@ -4,30 +4,22 @@ using System.Diagnostics;
 namespace Com.MattMcGill.Dcpu {
     public static class Dcpu {
 
-        public static Op FetchNextInstruction(IState before, out IState after) {
-            IState s1, s2;
-            var word = FetchNextWord(before, out s1);
+        public static Op FetchNextInstruction(IState state, ref ushort pc, ref ushort sp) {
+            var word = state.Get(pc++);
             byte opcode = (byte)(word & 0xF);
             if (opcode == 0) {
-                return DecodeNonBasic(word, s1, out after);
+                return DecodeNonBasic(state, word, ref pc, ref sp);
             }
-            return DecodeBasic(word, s1, out after);
+            return DecodeBasic(state, word, ref pc, ref sp);
         }
 
-        public static ushort FetchNextWord(IState before, out IState after) {
-            var addr = before.Get(Register.PC);
-            var word = before.Get(addr);
-            after = before.Set(Register.PC, (ushort)(addr + 1));
-            return word;
-        }
-
-        public static BasicOp DecodeBasic(ushort word, IState before, out IState after) {
+        public static BasicOp DecodeBasic(IState state, ushort word, ref ushort pc, ref ushort sp) {
             IState s1;
             byte opcode = (byte)(word & 0xF);
             byte a = (byte)((word >> 4) & 0x3F);
-            var operandA = GetOperand(a, before, out s1);
+            var operandA = GetOperand(state, a, ref pc, ref sp);
             byte b = (byte)((word >> 10) & 0x3F);
-            var operandB = GetOperand(b, s1, out after);
+            var operandB = GetOperand(state, b, ref pc, ref sp);
             switch (opcode) {
                 case 0x01: return new Set(operandA, operandB);
                 case 0x02: return new Add(operandA, operandB);
@@ -48,10 +40,10 @@ namespace Com.MattMcGill.Dcpu {
             }
         }
 
-        private static NonBasicOp DecodeNonBasic(ushort word, IState before, out IState after) {
+        private static NonBasicOp DecodeNonBasic(IState state, ushort word, ref ushort pc, ref ushort sp) {
             var opcode = (byte)((word >> 4) & 0x3F);
             var operandCode = (byte)((word >> 10) & 0x3F);
-            var operand = GetOperand(operandCode, before, out after);
+            var operand = GetOperand(state, operandCode, ref pc, ref sp);
             switch (opcode) {
                 case 0x01: return new Jsr(operand);
                 default: throw new NotImplementedException();
@@ -73,8 +65,7 @@ namespace Com.MattMcGill.Dcpu {
         /// We're presently assuming that getting an operand never
         /// affects the Overflow register.
         /// </remarks>
-        public static Operand GetOperand(byte operand, IState prev, out IState next) {
-            next = prev;
+        public static Operand GetOperand(IState state, byte operand, ref ushort pc, ref ushort sp) {
             if (0 <= operand && operand < 8) { // register
                 return new Reg((Register)operand);
             }
@@ -82,20 +73,16 @@ namespace Com.MattMcGill.Dcpu {
                 return new RegIndirect((Register)(operand & 0x07));
             }
             if (16 <= operand && operand < 24) { // [next word + register]
-                return new RegIndirectOffset((Register)(operand & 0x07), FetchNextWord(prev, out next));
+                return new RegIndirectOffset((Register)(operand & 0x07), state.Get(pc++));
             }
             if (operand == 0x18) { // [SP++]
-                var addr = prev.Get(Register.SP);
-                next = prev.Set(Register.SP, (ushort)(addr + 1));
-                return new Pop(addr);
+                return new Pop(sp++);
             }
             if (operand == 0x19) { // [SP]
-                return new Peek(prev.Get(Register.SP));
+                return new Peek(sp);
             }
             if (operand == 0x1a) { // [--SP]
-                var addr = (ushort)(prev.Get(Register.SP) - 1);
-                next = prev.Set(Register.SP, addr);
-                return new Push(addr);
+                return new Push(--sp);
             }
             if (operand == 0x1b) { // SP
                 return new Reg(Register.SP);
@@ -107,11 +94,10 @@ namespace Com.MattMcGill.Dcpu {
                 return new Reg(Register.O);
             }
             if (operand == 0x1e) { // [next word]
-                var addr = FetchNextWord(prev, out next);
-                return new Address(addr);
+                return new Address(state.Get(pc++));
             }
             if (operand == 0x1f) { // next literal
-                return new Literal(FetchNextWord(prev, out next));
+                return new Literal(state.Get(pc++));
             }
             if (0x20 <= operand && operand < 0x40) { // literal
                 return new Literal((ushort)(operand - 0x20));

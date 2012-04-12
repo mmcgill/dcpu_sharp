@@ -138,9 +138,10 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply(IState state) {
             var a = A.Get(state); var b = B.Get(state);
             if (IsNextSkipped(a, b)) {
-                IState next;
-                Dcpu.FetchNextInstruction(state, out next);
-                return next;
+                ushort pc = state.Get(Register.PC);
+                ushort sp = state.Get(Register.SP);
+                Dcpu.FetchNextInstruction(state, ref pc, ref sp);
+                return state.Set(Register.PC, pc);
             }
             return state;
         }

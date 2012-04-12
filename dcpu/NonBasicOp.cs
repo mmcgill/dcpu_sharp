@@ -19,11 +19,11 @@ namespace Com.MattMcGill.Dcpu {
     public class Jsr : NonBasicOp {
         public Jsr(Operand a) : base("JSR", a) {}
 
-        public override IState Apply(IState prev) {
-            IState s1;
-            var jumpTarget = A.Get(prev);
-            var s2 = Dcpu.GetOperand(0x1a, prev, out s1).Set(s1, prev.Get(Register.PC)); // SET PUSH, PC
-            return s2.Set(Register.PC, jumpTarget);
+        public override IState Apply(IState state) {
+            var jumpTarget = A.Get(state);
+            var sp = (ushort)(state.Get(Register.SP) - 1);
+            var op = new Set(new Push(sp), new Reg(Register.PC));
+            return op.Apply(state.Set(Register.SP, sp)).Set(Register.PC, jumpTarget);
         }
     }
 }
