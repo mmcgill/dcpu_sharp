@@ -102,4 +102,28 @@ namespace Com.MattMcGill.Dcpu {
             return string.Format("[{0} + 0x{1:X}]", _reg, _offset);
         }
     }
+
+    public class Push : Address {
+        public Push(ushort addr) : base(addr) {}
+
+        public override string ToString() {
+            return "Push";
+        }
+    }
+
+    public class Pop : Address {
+        public Pop(ushort addr) : base(addr) {}
+
+        public override string ToString() {
+            return "Pop";
+        }
+    }
+
+    public class Peek : Address {
+        public Peek(ushort addr) : base(addr) {}
+
+        public override string ToString() {
+            return "Peek";
+        }
+    }
 }

@@ -87,15 +87,15 @@ namespace Com.MattMcGill.Dcpu {
             if (operand == 0x18) { // [SP++]
                 var addr = prev.Get(Register.SP);
                 next = prev.Set(Register.SP, (ushort)(addr + 1));
-                return new Address(addr);
+                return new Pop(addr);
             }
             if (operand == 0x19) { // [SP]
-                return new Address(prev.Get(Register.SP));
+                return new Peek(prev.Get(Register.SP));
             }
             if (operand == 0x1a) { // [--SP]
                 var addr = (ushort)(prev.Get(Register.SP) - 1);
                 next = prev.Set(Register.SP, addr);
-                return new Address(addr);
+                return new Push(addr);
             }
             if (operand == 0x1b) { // SP
                 return new Reg(Register.SP);
