@@ -40,5 +40,7 @@ namespace Com.MattMcGill.Dcpu {
         /// <param name="value">value to set at the address</param>
         /// <returns>the state obtained by setting the word at addr to value</returns>
         IState Set(ushort addr, ushort value);
+
+        void MapMemory(ushort from, ushort to, IDevice device);
     }
 }

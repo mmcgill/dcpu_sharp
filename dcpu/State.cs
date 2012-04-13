@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Com.MattMcGill.Dcpu {
 
@@ -12,6 +13,8 @@ namespace Com.MattMcGill.Dcpu {
 
         private readonly ushort[] _regs;
 
+        private readonly List<MappedRange> _mappedRanges = new List<MappedRange>();
+
         public MutableState() {
             _memory = new ushort[0x10000];
             _regs = new ushort[11];
@@ -22,6 +25,12 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         public ushort Get(ushort addr) {
+            foreach (var range in _mappedRanges) {
+                if (range.Start <= addr && addr <= range.End) {
+                    return range.Device.Read((ushort)(addr - range.Start));
+                }
+            }
+
             return _memory[addr];
         }
 
@@ -32,8 +41,16 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         public IState Set(ushort addr, ushort value) {
+            foreach (var range in _mappedRanges) {
+                if (range.Start <= addr && addr <= range.End) {
+                    range.Device.Write((ushort)(addr - range.Start), value);
+                    return this;
+                }
+            }
+
             Trace.WriteLine(string.Format("  [0x{0:X}] <- {1}", addr, value));
             _memory[addr] = value;
+
             return this;
         }
 
@@ -50,6 +67,32 @@ namespace Com.MattMcGill.Dcpu {
                 } catch (EndOfStreamException) {}
             }
             return state;
+        }
+
+        public void MapMemory(ushort from, ushort to, IDevice device) {
+            int i = 0;
+            while (i < _mappedRanges.Count && _mappedRanges[i].End < from) ++i;
+
+            if (i == _mappedRanges.Count) {
+                _mappedRanges.Add(new MappedRange(from, to, device));
+            } else if (_mappedRanges[i].Start <= to) {
+                var msg = string.Format("Cannot map [{0}...{1}] to {2} -- [{3}...{4}] is already mapped to {5}!",
+                    from, to, _mappedRanges[i].Start, _mappedRanges[i].End, _mappedRanges[i].Device);
+                throw new ArgumentException(msg);
+            } else {
+                _mappedRanges.Insert(i, new MappedRange(from, to, device));
+            }
+        }
+    }
+
+    public class MappedRange {
+        public ushort Start { get; private set; }
+        public ushort End { get; private set; }
+        public IDevice Device { get; private set; }
+        public MappedRange(ushort start, ushort end, IDevice device) {
+            Start = start;
+            End = end;
+            Device = device;
         }
     }
 

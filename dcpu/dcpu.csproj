@@ -47,6 +47,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDevice.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="Operand.cs" />
     <Compile Include="Program.cs" />
