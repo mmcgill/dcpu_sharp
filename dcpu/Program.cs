@@ -28,32 +28,39 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private static void CpuLoop(IState state, Display display) {
+            bool debugging = true;
             while (true) {
                 var pc = state.Get(Register.PC);
 
-                Trace.Write(string.Format("[0x{0:X}] ", pc));
+                if (debugging)
+                    Trace.Write(string.Format("[0x{0:X}] ", pc));
 
                 var sp = state.Get(Register.SP);
                 var origSp = sp;
                 var op = Dcpu.FetchNextInstruction(state, ref pc, ref sp);
 
-                Trace.WriteLine(string.Format("{0}", op));
 
-                Console.Write("> ");
-                var input = Console.ReadLine().Trim();
-                if (input == "q") {
-                    display.Invoke(new Action(display.Close));
-                    break;
+                if (debugging) {
+                    Trace.WriteLine(string.Format("{0}", op));
+
+                    Console.Write("> ");
+                    var input = Console.ReadLine().Trim();
+                    if (input == "q") {
+                        break;
+                    } else if (input == "r") {
+                        debugging = false;
+                    }
                 }
                 state = state.Set(Register.PC, pc);
                 if (origSp != sp)
                     state = state.Set(Register.SP, sp);
                 state = op.Apply(state);
             }
+            display.Invoke(new Action(display.Close));
         }
 
         private static void PrintUsage() {
-            Console.WriteLine("dcpu <object file>", Environment.CommandLine[0]);
+            Console.WriteLine("Usage: dcpu <object file>", Environment.CommandLine[0]);
         }
     }
 }
