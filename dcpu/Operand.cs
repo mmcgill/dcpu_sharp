@@ -10,12 +10,12 @@ namespace Com.MattMcGill.Dcpu {
     }
 
     public class Literal : Operand {
-        private ushort _value;
+        public ushort Value { get; private set; }
 
-        public Literal(ushort value) { _value = value; }
+        public Literal(ushort value) { Value = value; }
 
         public override ushort Get(IState state) {
-            return _value;
+            return Value;
         }
 
         public override IState Set(IState prev, ushort value) {
@@ -23,7 +23,7 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         public override string ToString () {
-            return string.Format("0x{0:X}", _value);
+            return string.Format("0x{0:X}", Value);
         }
     }
 
@@ -46,20 +46,20 @@ namespace Com.MattMcGill.Dcpu {
     }
 
     public class Reg : Operand {
-        private Register _reg;
+        public Register Register { get; private set; }
 
-        public Reg(Register register) { _reg = register; }
+        public Reg(Register register) { Register = register; }
 
         public override ushort Get(IState state) {
-            return state.Get(_reg);
+            return state.Get(Register);
         }
 
         public override IState Set(IState prev, ushort value) {
-            return prev.Set(_reg, value);
+            return prev.Set(Register, value);
         }
 
         public override string ToString() {
-            return _reg.ToString();
+            return Register.ToString();
         }
     }
 

@@ -39,6 +39,10 @@ namespace Com.MattMcGill.Dcpu {
                 var origSp = sp;
                 var op = Dcpu.FetchNextInstruction(state, ref pc, ref sp);
 
+                if (IsHang(op)) {
+                    Console.WriteLine("Hit infinite loop, halting.");
+                    break;
+                }
 
                 if (debugging) {
                     Trace.WriteLine(string.Format("{0}", op));
@@ -57,6 +61,19 @@ namespace Com.MattMcGill.Dcpu {
                 state = op.Apply(state);
             }
             display.Invoke(new Action(display.Close));
+        }
+
+        private static bool IsHang(Op op) {
+            var set = op as Sub;
+            if (set == null) return false;
+
+            var a = set.A as Reg;
+            if (a == null) return false;
+
+            var b = set.B as Literal;
+            if (b == null) return false;
+
+            return a.Register == Register.PC && b.Value == 1;
         }
 
         private static void PrintUsage() {
