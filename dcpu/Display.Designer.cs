@@ -23,35 +23,24 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.displayLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // displayLabel
-            // 
-            this.displayLabel.AutoSize = true;
-            this.displayLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.displayLabel.Location = new System.Drawing.Point(12, 9);
-            this.displayLabel.Name = "displayLabel";
-            this.displayLabel.Size = new System.Drawing.Size(49, 14);
-            this.displayLabel.TabIndex = 0;
-            this.displayLabel.Text = "label1";
             // 
             // Display
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 273);
-            this.Controls.Add(this.displayLabel);
+            this.ClientSize = new System.Drawing.Size(384, 288);
+            this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "Display";
             this.Text = "Display";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.DoPaint);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label displayLabel;
 
     }
 }
