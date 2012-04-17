@@ -17,8 +17,13 @@ namespace Com.MattMcGill.Dcpu {
                 PrintUsage();
                 Environment.Exit(1);
             }
+
             IState state = MutableState.ReadFromFile(args[0]);
-            var display = new Display();
+
+            var keyboard = new Keyboard();
+            state.MapMemory(0x9000, (ushort)(0x9000 + Keyboard.BUFFER_WORDS), keyboard);
+
+            var display = new Display(keyboard);
             state.MapMemory(0x8000, (ushort)(0x8000 + Display.WIDTH * Display.HEIGHT), display);
 
             Task.Factory.StartNew(() => CpuLoop(state, display));

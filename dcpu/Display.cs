@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,10 +13,19 @@ namespace Com.MattMcGill.Dcpu {
         public const int WIDTH = 32;
         public const int HEIGHT = 12;
         private char[] buffer = new char[WIDTH * HEIGHT];
+        private IKeyboard _keyboard;
 
-        public Display() {
+        public Display(IKeyboard keyboard) {
+            _keyboard = keyboard;
             InitializeComponent();
             WriteDisplayFromBuffer();
+
+            KeyPress += new KeyPressEventHandler(HandleKeyPress);
+        }
+
+        private void HandleKeyPress(object sender, KeyPressEventArgs args) {
+            _keyboard.KeyPressed(args.KeyChar);
+            args.Handled = true;
         }
 
         private void WriteDisplayFromBuffer() {
