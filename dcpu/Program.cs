@@ -12,7 +12,7 @@ namespace Com.MattMcGill.Dcpu {
 
         [STAThread]
         static void Main(string[] args) {
-            Trace.Listeners.Add(new ConsoleTraceListener());
+            //Trace.Listeners.Add(new ConsoleTraceListener());
             if (args.Length == 0) {
                 PrintUsage();
                 Environment.Exit(1);
@@ -33,7 +33,7 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private static void CpuLoop(IState state, Display display) {
-            bool debugging = true;
+            bool debugging = false;
             while (true) {
                 var pc = state.Get(Register.PC);
 
