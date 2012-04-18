@@ -83,6 +83,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Examples\colortest.asm" />
     <Content Include="Examples\echo.asm" />
     <EmbeddedResource Include="tileset.png" />
   </ItemGroup>
