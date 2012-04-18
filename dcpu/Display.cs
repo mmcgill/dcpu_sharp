@@ -24,7 +24,6 @@ namespace Com.MattMcGill.Dcpu {
             _keyboard = keyboard;
             InitializeComponent();
             LoadDefaultTileset();
-            WriteDisplayFromBuffer();
 
             KeyPress += new KeyPressEventHandler(HandleKeyPress);
         }
@@ -44,10 +43,6 @@ namespace Com.MattMcGill.Dcpu {
             args.Handled = true;
         }
 
-        private void WriteDisplayFromBuffer() {
-            Invalidate();
-        }
-
         public ushort Read(ushort addr) {
             lock (_buffer) {
                 return _buffer[addr];
@@ -58,17 +53,27 @@ namespace Com.MattMcGill.Dcpu {
             lock (_buffer) {
                 _buffer[addr] = value;
             }
-            Invoke(new Action(WriteDisplayFromBuffer));
+            Invoke(new Action(() => InvalidateCharacterAt(addr)));
+        }
+
+        private void InvalidateCharacterAt(ushort addr) {
+            var row = addr / WIDTH;
+            var col = addr % WIDTH;
+            Invalidate(new Rectangle(col * 12, row * 24, 12, 24));
         }
 
         private void DoPaint(object sender, PaintEventArgs e) {
             var g = e.Graphics;
+            var startCol = e.ClipRectangle.Left / 12;
+            var startRow = e.ClipRectangle.Top / 24;
+            var endCol = e.ClipRectangle.Right / 12 + 1;
+            endCol = endCol > WIDTH ? WIDTH : endCol;
+            var endRow = e.ClipRectangle.Bottom / 24 + 1;
+            endRow = endRow > HEIGHT ? HEIGHT : endRow;
 
-            lock (_buffer) {
-                for (int row=0; row < HEIGHT; ++row) {
-                    for (int col=0; col < WIDTH; ++col) {
-                        PaintTile(g, row, col, _buffer[row * WIDTH + col]);
-                    }
+            for (int row=startRow; row < endRow; ++row) {
+                for (int col=startCol; col < endCol; ++col) {
+                    PaintTile(g, row, col, _buffer[row * WIDTH + col]);
                 }
             }
         }
