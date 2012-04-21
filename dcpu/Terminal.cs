@@ -12,17 +12,22 @@ using System.Windows.Forms;
 
 namespace Com.MattMcGill.Dcpu {
     public partial class Terminal : Form, IDevice {
+
         public const ushort DISPLAY_ADDR = 0x8000;
         public const int WIDTH = 32;
         public const int HEIGHT = 12;
 
+        public static readonly int KEYBOARD_BUFFER_WORDS = 16;
+        public static readonly ushort KEYBOARD_ADDR = 0x9000;
+
         private ushort[] _buffer = new ushort[WIDTH * HEIGHT];
-        private IKeyboard _keyboard;
+
+        private ushort[] _ringBuffer = new ushort[KEYBOARD_BUFFER_WORDS];
+        private int _cursor = 0;
 
         private Image _tileset;
 
-        public Terminal(IKeyboard keyboard) {
-            _keyboard = keyboard;
+        public Terminal() {
             InitializeComponent();
             LoadDefaultTileset();
 
@@ -40,25 +45,42 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private void HandleKeyPress(object sender, KeyPressEventArgs args) {
-            _keyboard.KeyPressed(args.KeyChar);
+            lock (_ringBuffer) {
+                _ringBuffer[_cursor] = args.KeyChar;
+                _cursor = (_cursor + 1) % _ringBuffer.Length;
+            }
             args.Handled = true;
         }
 
         public void Map(IState state) {
             state.MapMemory(DISPLAY_ADDR, (ushort)(DISPLAY_ADDR + (WIDTH * HEIGHT)), this);
+            state.MapMemory(KEYBOARD_ADDR, (ushort)(KEYBOARD_ADDR + KEYBOARD_BUFFER_WORDS), this);
         }
 
         public ushort Read(ushort addr) {
-            lock (_buffer) {
-                return _buffer[addr - DISPLAY_ADDR];
+            if (addr >= KEYBOARD_ADDR) {
+                lock (_ringBuffer) {
+                    return _ringBuffer[addr - KEYBOARD_ADDR];
+                }
+            } else {
+                lock (_buffer) {
+                    return _buffer[addr - DISPLAY_ADDR];
+                }
             }
         }
 
         public void Write(ushort addr, ushort value) {
-            lock (_buffer) {
-                _buffer[addr - DISPLAY_ADDR] = value;
+            if (addr >= KEYBOARD_ADDR) {
+                lock (_ringBuffer) {
+                    _ringBuffer[addr - KEYBOARD_ADDR] = value;
+                }
+            } else {
+                lock (_buffer) {
+                    _buffer[addr - DISPLAY_ADDR] = value;
+                }
+
+                Invoke(new Action(() => InvalidateCharacterAt((ushort)(addr - DISPLAY_ADDR))));
             }
-            Invoke(new Action(() => InvalidateCharacterAt((ushort)(addr - DISPLAY_ADDR))));
         }
 
         private void InvalidateCharacterAt(ushort addr) {
