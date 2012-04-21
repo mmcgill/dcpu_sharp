@@ -26,7 +26,6 @@ namespace Com.MattMcGill.Dcpu {
         public override string ToString () {
             return string.Format ("{0} {1}, {2}", _name, A, B);
         }
-
     }
 
     public class Set : BasicOp {
@@ -35,6 +34,8 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply (IState state) {
             return A.Set(state, B.Get(state));
         }
+
+        public override int Cycles(IState state) { return 1; }
     }
 
     public class Add : BasicOp {
@@ -44,6 +45,8 @@ namespace Com.MattMcGill.Dcpu {
             var sum = A.Get(state) + B.Get(state);
             return A.Set(state, (ushort)sum).Set(Register.O, (ushort)(sum >> 16));
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 
     public class Sub : BasicOp {
@@ -53,6 +56,8 @@ namespace Com.MattMcGill.Dcpu {
             var diff = A.Get(state) - B.Get(state);
             return A.Set(state, (ushort)diff).Set(Register.O, (ushort)(diff >> 16));
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 
     public class Mul : BasicOp {
@@ -64,6 +69,8 @@ namespace Com.MattMcGill.Dcpu {
             var overflow = (ushort)((product >> 16) & 0xFFFF);
             return A.Set(state, (ushort)product).Set(Register.O, overflow);
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 
     public class Div : BasicOp {
@@ -75,6 +82,8 @@ namespace Com.MattMcGill.Dcpu {
             var overflow = b == 0 ? (ushort)0 : (ushort)(((a << 16) / (uint)b) & 0xFFFF);
             return A.Set(state, (ushort)product).Set(Register.O, overflow);
         }
+
+        public override int Cycles(IState state) { return 3; }
     }
 
     public class Mod : BasicOp {
@@ -84,6 +93,8 @@ namespace Com.MattMcGill.Dcpu {
             var a = A.Get(state); var b = B.Get(state);
             return A.Set(state, b == 0 ? (ushort)0 : (ushort)(a % b));
         }
+
+        public override int Cycles(IState state) { return 3; }
     }
 
     public class Shl : BasicOp {
@@ -95,6 +106,8 @@ namespace Com.MattMcGill.Dcpu {
             var result = (ushort)(a << (b % 16));
             return A.Set(state, result).Set(Register.O, (ushort)(a >> overflowShift));
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 
     public class Shr : BasicOp {
@@ -107,6 +120,8 @@ namespace Com.MattMcGill.Dcpu {
             var result = (ushort)(a >> shift);
             return A.Set(state, result).Set(Register.O, underflow);
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 
     public class And : BasicOp {
@@ -115,6 +130,8 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply(IState state) {
             return A.Set(state, (ushort)(A.Get(state) & B.Get(state)));
         }
+
+        public override int Cycles(IState state) { return 1; }
     }
 
     public class Bor : BasicOp {
@@ -123,6 +140,8 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply(IState state) {
             return A.Set(state, (ushort)(A.Get(state) | B.Get(state)));
         }
+
+        public override int Cycles(IState state) { return 1; }
     }
 
     public class Xor : BasicOp {
@@ -131,13 +150,15 @@ namespace Com.MattMcGill.Dcpu {
         public override IState Apply(IState state) {
             return A.Set(state, (ushort)(A.Get(state) ^ B.Get(state)));
         }
+
+        public override int Cycles(IState state) { return 1; }
     }
 
     public abstract class If : BasicOp {
         public If(string name, Operand a, Operand b) : base(name, a, b) {}
+
         public override IState Apply(IState state) {
-            var a = A.Get(state); var b = B.Get(state);
-            if (IsNextSkipped(a, b)) {
+            if (IsNextSkipped(A.Get(state), B.Get(state))) {
                 ushort pc = state.Get(Register.PC);
                 ushort sp = state.Get(Register.SP);
                 Dcpu.FetchNextInstruction(state, ref pc, ref sp);
@@ -145,7 +166,12 @@ namespace Com.MattMcGill.Dcpu {
             }
             return state;
         }
+
         protected abstract bool IsNextSkipped(ushort a, ushort b);
+
+        public override int Cycles(IState state) {
+            return 2 + (IsNextSkipped(A.Get(state), B.Get(state)) ? 1 : 0);
+        }
     }
 
     public class Ife : If {

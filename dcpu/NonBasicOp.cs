@@ -25,6 +25,8 @@ namespace Com.MattMcGill.Dcpu {
             var op = new Set(new Push(sp), new Reg(Register.PC));
             return op.Apply(state.Set(Register.SP, sp)).Set(Register.PC, jumpTarget);
         }
+
+        public override int Cycles(IState state) { return 2; }
     }
 }
 
