@@ -27,7 +27,7 @@ namespace Com.MattMcGill.Dcpu {
         public ushort Get(ushort addr) {
             foreach (var range in _mappedRanges) {
                 if (range.Start <= addr && addr <= range.End) {
-                    return range.Device.Read((ushort)(addr - range.Start));
+                    return range.Device.Read(addr);
                 }
             }
 
@@ -43,7 +43,7 @@ namespace Com.MattMcGill.Dcpu {
         public IState Set(ushort addr, ushort value) {
             foreach (var range in _mappedRanges) {
                 if (range.Start <= addr && addr <= range.End) {
-                    range.Device.Write((ushort)(addr - range.Start), value);
+                    range.Device.Write(addr, value);
                     return this;
                 }
             }

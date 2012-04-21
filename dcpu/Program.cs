@@ -21,10 +21,10 @@ namespace Com.MattMcGill.Dcpu {
             IState state = MutableState.ReadFromFile(args[0]);
 
             var keyboard = new Keyboard();
-            state.MapMemory(0x9000, (ushort)(0x9000 + Keyboard.BUFFER_WORDS), keyboard);
+            keyboard.Map(state);
 
-            var display = new Display(keyboard);
-            state.MapMemory(0x8000, (ushort)(0x8000 + Display.WIDTH * Display.HEIGHT), display);
+            var display = new Terminal(keyboard);
+            display.Map(state);
 
             Task.Factory.StartNew(() => CpuLoop(state, display));
 
@@ -32,7 +32,7 @@ namespace Com.MattMcGill.Dcpu {
             Application.Run(display);
         }
 
-        private static void CpuLoop(IState state, Display display) {
+        private static void CpuLoop(IState state, Terminal display) {
             bool debugging = false;
             while (true) {
                 var pc = state.Get(Register.PC);

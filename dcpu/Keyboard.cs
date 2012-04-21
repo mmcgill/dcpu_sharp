@@ -8,20 +8,21 @@ namespace Com.MattMcGill.Dcpu
     }
 
     public class Keyboard : IDevice, IKeyboard {
-        public static readonly int BUFFER_WORDS = 16;
+        public static readonly int KEYBOARD_BUFFER_WORDS = 16;
+        public static readonly ushort KEYBOARD_ADDR = 0x9000;
 
-        private ushort[] _ringBuffer = new ushort[BUFFER_WORDS];
+        private ushort[] _ringBuffer = new ushort[KEYBOARD_BUFFER_WORDS];
         private int _cursor = 0;
 
-        public ushort Read(ushort offset) {
+        public ushort Read(ushort addr) {
             lock (_ringBuffer) {
-                return _ringBuffer[offset];
+                return _ringBuffer[addr - KEYBOARD_ADDR];
             }
         }
 
         public void Write(ushort addr, ushort value) {
             lock (_ringBuffer) {
-                _ringBuffer[addr] = value;
+                _ringBuffer[addr - KEYBOARD_ADDR] = value;
             }
         }
 
@@ -30,6 +31,10 @@ namespace Com.MattMcGill.Dcpu
                 _ringBuffer[_cursor] = key;
                 _cursor = (_cursor + 1) % _ringBuffer.Length;
             }
+        }
+
+        public void Map(IState state) {
+            state.MapMemory(KEYBOARD_ADDR, (ushort)(KEYBOARD_ADDR + KEYBOARD_BUFFER_WORDS), this);
         }
     }
 }

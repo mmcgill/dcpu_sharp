@@ -12,6 +12,7 @@ using System.Windows.Forms;
 
 namespace Com.MattMcGill.Dcpu {
     public partial class Terminal : Form, IDevice {
+        public const ushort DISPLAY_ADDR = 0x8000;
         public const int WIDTH = 32;
         public const int HEIGHT = 12;
 
@@ -43,17 +44,21 @@ namespace Com.MattMcGill.Dcpu {
             args.Handled = true;
         }
 
+        public void Map(IState state) {
+            state.MapMemory(DISPLAY_ADDR, (ushort)(DISPLAY_ADDR + (WIDTH * HEIGHT)), this);
+        }
+
         public ushort Read(ushort addr) {
             lock (_buffer) {
-                return _buffer[addr];
+                return _buffer[addr - DISPLAY_ADDR];
             }
         }
 
         public void Write(ushort addr, ushort value) {
             lock (_buffer) {
-                _buffer[addr] = value;
+                _buffer[addr - DISPLAY_ADDR] = value;
             }
-            Invoke(new Action(() => InvalidateCharacterAt(addr)));
+            Invoke(new Action(() => InvalidateCharacterAt((ushort)(addr - DISPLAY_ADDR))));
         }
 
         private void InvalidateCharacterAt(ushort addr) {
