@@ -1,5 +1,5 @@
 ﻿namespace Com.MattMcGill.Dcpu {
-    partial class Display {
+    partial class Terminal {
         /// <summary>
         /// Required designer variable.
         /// </summary>

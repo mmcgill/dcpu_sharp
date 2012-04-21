@@ -51,11 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Display.cs">
+    <Compile Include="Terminal.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Display.Designer.cs">
-      <DependentUpon>Display.cs</DependentUpon>
+    <Compile Include="Terminal.Designer.cs">
+      <DependentUpon>Terminal.cs</DependentUpon>
     </Compile>
     <Compile Include="IDevice.cs" />
     <Compile Include="IState.cs" />
@@ -78,8 +78,8 @@
     <None Include="Examples\conway.asm" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Display.resx">
-      <DependentUpon>Display.cs</DependentUpon>
+    <EmbeddedResource Include="Terminal.resx">
+      <DependentUpon>Terminal.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

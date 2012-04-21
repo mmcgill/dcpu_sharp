@@ -11,7 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Com.MattMcGill.Dcpu {
-    public partial class Display : Form, IDevice {
+    public partial class Terminal : Form, IDevice {
         public const int WIDTH = 32;
         public const int HEIGHT = 12;
 
@@ -20,7 +20,7 @@ namespace Com.MattMcGill.Dcpu {
 
         private Image _tileset;
 
-        public Display(IKeyboard keyboard) {
+        public Terminal(IKeyboard keyboard) {
             _keyboard = keyboard;
             InitializeComponent();
             LoadDefaultTileset();
