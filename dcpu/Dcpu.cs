@@ -5,16 +5,13 @@ namespace Com.MattMcGill.Dcpu {
     public static class Dcpu {
 
         public static Op FetchNextInstruction(IState state, ref ushort pc, ref ushort sp) {
-            var word = state.Get(pc++);
-            byte opcode = (byte)(word & 0xF);
-            if (opcode == 0) {
-                return DecodeNonBasic(state, word, ref pc, ref sp);
-            }
-            return DecodeBasic(state, word, ref pc, ref sp);
+            var firstWord = state.Get(pc++);
+            return 0 == (firstWord & 0xF) ?
+                (Op)DecodeNonBasic(state, firstWord, ref pc, ref sp) :
+                (Op)DecodeBasic(state, firstWord, ref pc, ref sp);
         }
 
         public static BasicOp DecodeBasic(IState state, ushort word, ref ushort pc, ref ushort sp) {
-            IState s1;
             byte opcode = (byte)(word & 0xF);
             byte a = (byte)((word >> 4) & 0x3F);
             var operandA = GetOperand(state, a, ref pc, ref sp);
@@ -36,7 +33,7 @@ namespace Com.MattMcGill.Dcpu {
                 case 0x0d: return new Ifn(operandA, operandB);
                 case 0x0e: return new Ifg(operandA, operandB);
                 case 0x0f: return new Ifb(operandA, operandB);
-                default: throw new NotImplementedException();
+                default: throw new ArgumentException(string.Format("{0:X} is not a valid basic opcode", opcode));
             }
         }
 
@@ -46,63 +43,26 @@ namespace Com.MattMcGill.Dcpu {
             var operand = GetOperand(state, operandCode, ref pc, ref sp);
             switch (opcode) {
                 case 0x01: return new Jsr(operand);
-                default: throw new NotImplementedException();
+                default: throw new ArgumentException(string.Format("{0:X} is not a valid non-basic opcode", opcode));
             }
         }
 
-        /// <summary>
-        /// Read the operand.
-        /// </summary>
-        /// <param name="operand">operand to read</param>
-        /// <param name="prev">current DCPU state</param>
-        /// <param name="next">DCPU state after reading</param>
-        /// <returns>a value</returns>
-        /// <remarks>
-        /// GetOperand modifies SP for PUSH and POP operands,
-        /// and the PC for addressing modes that read the next
-        /// word of RAM.
-        ///
-        /// We're presently assuming that getting an operand never
-        /// affects the Overflow register.
-        /// </remarks>
-        public static Operand GetOperand(IState state, byte operand, ref ushort pc, ref ushort sp) {
-            if (0 <= operand && operand < 8) { // register
-                return new Reg((Register)operand);
+        public static Operand GetOperand(IState state, byte a, ref ushort pc, ref ushort sp) {
+            if (0x00 <= a && a < 0x08) return new Reg((Register)a);
+            if (0x08 <= a && a < 0x10) return new RegIndirect((Register)(a & 0x07));
+            if (0x10 <= a && a < 0x18) return new RegIndirectOffset((Register)(a & 0x07), state.Get(pc++));
+            if (0x20 <= a && a < 0x40) return new Literal((ushort)(a - 0x20));
+            switch (a) {
+                case 0x18: return new Pop(sp++);
+                case 0x19: return new Peek(sp);
+                case 0x1a: return new Push(--sp);
+                case 0x1b: return new Reg(Register.SP);
+                case 0x1c: return new Reg(Register.PC);
+                case 0x1d: return new Reg(Register.O);
+                case 0x1e: return new Address(state.Get(pc++));
+                case 0x1f: return new Literal(state.Get(pc++));
             }
-            if (8 <= operand && operand < 16) { // [register]
-                return new RegIndirect((Register)(operand & 0x07));
-            }
-            if (16 <= operand && operand < 24) { // [next word + register]
-                return new RegIndirectOffset((Register)(operand & 0x07), state.Get(pc++));
-            }
-            if (operand == 0x18) { // [SP++]
-                return new Pop(sp++);
-            }
-            if (operand == 0x19) { // [SP]
-                return new Peek(sp);
-            }
-            if (operand == 0x1a) { // [--SP]
-                return new Push(--sp);
-            }
-            if (operand == 0x1b) { // SP
-                return new Reg(Register.SP);
-            }
-            if (operand == 0x1c) { // PC
-                return new Reg(Register.PC);
-            }
-            if (operand == 0x1d) { // O
-                return new Reg(Register.O);
-            }
-            if (operand == 0x1e) { // [next word]
-                return new Address(state.Get(pc++));
-            }
-            if (operand == 0x1f) { // next literal
-                return new Literal(state.Get(pc++));
-            }
-            if (0x20 <= operand && operand < 0x40) { // literal
-                return new Literal((ushort)(operand - 0x20));
-            }
-            throw new ArgumentException("Invalid operand " + operand);
+            throw new ArgumentException("Invalid operand " + a);
         }
      }
 }
