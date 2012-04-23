@@ -1,8 +1,47 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Com.MattMcGill.Dcpu {
-    public static class Dcpu {
+    public class Dcpu {
+        private bool _running;
+        private IState _state;
+        private Task _cpuTask;
+
+        public Dcpu(IState initial) {
+            _running = false;
+            _state = initial;
+        }
+
+        public void Start() {
+            if (!_running) {
+                _running = true;
+                _cpuTask = Task.Factory.StartNew(() => CpuLoop(_state));
+            }
+        }
+
+        public void Stop() {
+            if (_running) {
+                _running = false;
+                _cpuTask.Wait();
+            }
+        }
+
+        public void CpuLoop(IState initial) {
+            var state = initial;
+            while (_running) {
+                var pc = state.Get(Register.PC);
+                var sp = state.Get(Register.SP);
+                var origSp = sp;
+
+                var op = Dcpu.FetchNextInstruction(state, ref pc, ref sp);
+
+                state = state.Set(Register.PC, pc);
+                if (origSp != sp)
+                    state = state.Set(Register.SP, sp);
+                state = op.Apply(state);
+            }
+        }
 
         public static Op FetchNextInstruction(IState state, ref ushort pc, ref ushort sp) {
             var firstWord = state.Get(pc++);
