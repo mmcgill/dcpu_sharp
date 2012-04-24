@@ -74,6 +74,7 @@
     <Compile Include="NonBasicOp.cs" />
     <Compile Include="Tests\NonBasicOpTest.cs" />
     <Compile Include="Op.cs" />
+    <Compile Include="AbstractState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

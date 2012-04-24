@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace Com.MattMcGill.Dcpu {
     public class Dcpu {
+        public static readonly int MAX_ADDRESS = 0x10000;
         private bool _running;
         private IState _state;
         private Task _cpuTask;
