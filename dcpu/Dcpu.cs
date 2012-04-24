@@ -1,17 +1,22 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.IO;
+using System.Collections.Concurrent;
 
 namespace Com.MattMcGill.Dcpu {
     public class Dcpu {
-        public static readonly int MAX_ADDRESS = 0x10000;
+        public static readonly int MAX_ADDRESS = 0xFFFF;
+
         private bool _running;
         private IState _state;
         private Task _cpuTask;
+        public ConcurrentQueue<IEvent> _pendingEvents;
 
         public Dcpu(IState initial) {
             _running = false;
             _state = initial;
+            _pendingEvents = new ConcurrentQueue<IEvent>();
         }
 
         public void Start() {
@@ -28,9 +33,18 @@ namespace Com.MattMcGill.Dcpu {
             }
         }
 
+        public void NewEvent(IEvent e) {
+            _pendingEvents.Enqueue(e);
+        }
+
         public void CpuLoop(IState initial) {
             var state = initial;
             while (_running) {
+                IEvent e;
+                if (_pendingEvents.TryDequeue(out e)) {
+                    state = state.Handle(e);
+                }
+
                 var pc = state.Get(Register.PC);
                 var sp = state.Get(Register.SP);
                 var origSp = sp;
@@ -103,6 +117,21 @@ namespace Com.MattMcGill.Dcpu {
                 case 0x1f: return new Literal(state.Get(pc++));
             }
             throw new ArgumentException("Invalid operand " + a);
+        }
+
+        public static ushort[] LoadImage(string path) {
+            ushort[] image = new ushort[Dcpu.MAX_ADDRESS + 1];
+            using (var objFileReader = new BinaryReader(new FileStream(path, FileMode.Open))) {
+                ushort i = 0;
+                try {
+                    while (true) {
+                        var msb = objFileReader.ReadByte();
+                        var lsb = objFileReader.ReadByte();
+                        image[i++] = (ushort)((msb << 8) ^ lsb);
+                    }
+                } catch (EndOfStreamException) { }
+            }
+            return image;
         }
      }
 }

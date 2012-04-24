@@ -11,27 +11,19 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Com.MattMcGill.Dcpu {
-    public partial class Terminal : Form, IDevice {
-
-        public const ushort DISPLAY_ADDR = 0x8000;
-        public const int WIDTH = 32;
-        public const int HEIGHT = 12;
-
-        public static readonly int KEYBOARD_BUFFER_WORDS = 16;
-        public static readonly ushort KEYBOARD_ADDR = 0x9000;
-
-        private ushort[] _buffer = new ushort[WIDTH * HEIGHT];
-
-        private ushort[] _ringBuffer = new ushort[KEYBOARD_BUFFER_WORDS];
-        private int _cursor = 0;
+    public partial class Terminal : Form {
 
         private Image _tileset;
+        private Dcpu _dcpu;
+        private ushort[] _buffer = new ushort[DisplayState.Width * DisplayState.Height];
 
-        public Terminal() {
+        public Terminal(Dcpu dcpu, DisplayState initialDisplayState) {
             InitializeComponent();
             LoadDefaultTileset();
 
+            _dcpu = dcpu;
             KeyPress += new KeyPressEventHandler(HandleKeyPress);
+            initialDisplayState.OnWrite += new EventHandler<DeviceWriteEventArgs>(HandleDisplayUpdate);
         }
 
         private void LoadDefaultTileset() {
@@ -45,47 +37,20 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private void HandleKeyPress(object sender, KeyPressEventArgs args) {
-            lock (_ringBuffer) {
-                _ringBuffer[_cursor] = args.KeyChar;
-                _cursor = (_cursor + 1) % _ringBuffer.Length;
-            }
+            _dcpu.NewEvent(new KeyboardEvent(args.KeyChar));
             args.Handled = true;
         }
 
-        public void Map(IState state) {
-            state.MapMemory(DISPLAY_ADDR, (ushort)(DISPLAY_ADDR + (WIDTH * HEIGHT)), this);
-            state.MapMemory(KEYBOARD_ADDR, (ushort)(KEYBOARD_ADDR + KEYBOARD_BUFFER_WORDS), this);
-        }
-
-        public ushort Read(ushort addr) {
-            if (addr >= KEYBOARD_ADDR) {
-                lock (_ringBuffer) {
-                    return _ringBuffer[addr - KEYBOARD_ADDR];
-                }
-            } else {
-                lock (_buffer) {
-                    return _buffer[addr - DISPLAY_ADDR];
-                }
-            }
-        }
-
-        public void Write(ushort addr, ushort value) {
-            if (addr >= KEYBOARD_ADDR) {
-                lock (_ringBuffer) {
-                    _ringBuffer[addr - KEYBOARD_ADDR] = value;
-                }
-            } else {
-                lock (_buffer) {
-                    _buffer[addr - DISPLAY_ADDR] = value;
-                }
-
-                Invoke(new Action(() => InvalidateCharacterAt((ushort)(addr - DISPLAY_ADDR))));
-            }
+        private void HandleDisplayUpdate(object sender, DeviceWriteEventArgs args) {
+            if (args.OldValue == args.NewValue)
+                return;
+            _buffer[args.Address - DisplayState.DisplayAddress] = args.NewValue;
+            Invoke(new Action(() => InvalidateCharacterAt((ushort)(args.Address - DisplayState.DisplayAddress))));
         }
 
         private void InvalidateCharacterAt(ushort addr) {
-            var row = addr / WIDTH;
-            var col = addr % WIDTH;
+            var row = addr / DisplayState.Width;
+            var col = addr % DisplayState.Width;
             Invalidate(new Rectangle(col * 12, row * 24, 12, 24));
         }
 
@@ -94,13 +59,13 @@ namespace Com.MattMcGill.Dcpu {
             var startCol = e.ClipRectangle.Left / 12;
             var startRow = e.ClipRectangle.Top / 24;
             var endCol = e.ClipRectangle.Right / 12 + 1;
-            endCol = endCol > WIDTH ? WIDTH : endCol;
+            endCol = endCol > DisplayState.Width ? DisplayState.Width : endCol;
             var endRow = e.ClipRectangle.Bottom / 24 + 1;
-            endRow = endRow > HEIGHT ? HEIGHT : endRow;
+            endRow = endRow > DisplayState.Height ? DisplayState.Height : endRow;
 
             for (int row=startRow; row < endRow; ++row) {
                 for (int col=startCol; col < endCol; ++col) {
-                    PaintTile(g, row, col, _buffer[row * WIDTH + col]);
+                    PaintTile(g, row, col, _buffer[row * DisplayState.Width + col]);
                 }
             }
         }

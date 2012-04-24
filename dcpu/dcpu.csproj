@@ -54,6 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisplayState.cs" />
+    <Compile Include="IEvent.cs" />
+    <Compile Include="KeyboardState.cs" />
     <Compile Include="MutableState.cs" />
     <Compile Include="PersistentArray.cs" />
     <Compile Include="Terminal.cs">
@@ -76,8 +79,9 @@
     <Compile Include="Tests\NonBasicOpTest.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="ImmutableState.cs" />
-    <Compile Include="AbstractState.cs" />
     <Compile Include="Tests\PersistentArrayTest.cs" />
+    <Compile Include="MemoryMap.cs" />
+    <Compile Include="IDeviceState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -41,6 +41,8 @@ namespace Com.MattMcGill.Dcpu {
         /// <returns>the state obtained by setting the word at addr to value</returns>
         IState Set(ushort addr, ushort value);
 
-        void MapMemory(ushort from, ushort to, IDevice device);
+        IState Map(ushort from, ushort to, DeviceState device);
+
+        IState Handle(IEvent e);
     }
 }

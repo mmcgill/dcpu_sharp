@@ -18,12 +18,19 @@ namespace Com.MattMcGill.Dcpu {
                 Environment.Exit(1);
             }
 
+            var keyboardState = new KeyboardState();
+            var displayState = new DisplayState();
             IState state = ImmutableState.ReadFromFile(args[0]);
-
-            var terminal = new Terminal();
-            terminal.Map(state);
-
+            state = state.Map((ushort)KeyboardState.BufferAddress,
+                (ushort)(KeyboardState.BufferAddress + KeyboardState.BufferLength + 1),
+                keyboardState);
+            state = state.Map((ushort)DisplayState.DisplayAddress,
+                (ushort)(DisplayState.DisplayAddress + DisplayState.Width * DisplayState.Height),
+                displayState);
             _cpu = new Dcpu(state);
+
+            var terminal = new Terminal(_cpu, displayState);
+
             terminal.FormClosed += new FormClosedEventHandler( (obj, arg) => _cpu.Stop());
             _cpu.Start();
 
