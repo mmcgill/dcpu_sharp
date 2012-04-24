@@ -18,7 +18,7 @@ namespace Com.MattMcGill.Dcpu {
                 Environment.Exit(1);
             }
 
-            IState state = MutableState.ReadFromFile(args[0]);
+            IState state = ImmutableState.ReadFromFile(args[0]);
 
             var terminal = new Terminal();
             terminal.Map(state);
