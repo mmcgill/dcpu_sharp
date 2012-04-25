@@ -38,24 +38,23 @@ namespace Com.MattMcGill.Dcpu {
             _pendingEvents.Enqueue(e);
         }
 
-        public void CpuLoop(IState initial) {
-            var state = initial;
-            while (_running) {
+        public void CpuLoop() {
+            while (IsRunning) {
                 IEvent e;
                 if (_pendingEvents.TryDequeue(out e)) {
-                    state = state.Handle(e);
+                    _state = _state.Handle(e);
                 }
 
-                var pc = state.Get(Register.PC);
-                var sp = state.Get(Register.SP);
+                var pc = _state.Get(Register.PC);
+                var sp = _state.Get(Register.SP);
                 var origSp = sp;
 
-                var op = Dcpu.FetchNextInstruction(state, ref pc, ref sp);
+                var op = Dcpu.FetchNextInstruction(_state, ref pc, ref sp);
 
-                state = state.Set(Register.PC, pc);
+                _state = _state.Set(Register.PC, pc);
                 if (origSp != sp)
-                    state = state.Set(Register.SP, sp);
-                state = op.Apply(state);
+                    _state = _state.Set(Register.SP, sp);
+                _state = op.Apply(_state);
             }
         }
 
