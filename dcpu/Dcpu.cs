@@ -8,27 +8,28 @@ namespace Com.MattMcGill.Dcpu {
     public class Dcpu {
         public static readonly int MAX_ADDRESS = 0xFFFF;
 
-        private bool _running;
+        public bool IsRunning { get; private set; }
+
         private IState _state;
         private Task _cpuTask;
         public ConcurrentQueue<IEvent> _pendingEvents;
 
         public Dcpu(IState initial) {
-            _running = false;
+            IsRunning = false;
             _state = initial;
             _pendingEvents = new ConcurrentQueue<IEvent>();
         }
 
         public void Start() {
-            if (!_running) {
-                _running = true;
-                _cpuTask = Task.Factory.StartNew(() => CpuLoop(_state));
+            if (!IsRunning) {
+                IsRunning = true;
+                _cpuTask = Task.Factory.StartNew(() => CpuLoop());
             }
         }
 
         public void Stop() {
-            if (_running) {
-                _running = false;
+            if (IsRunning) {
+                IsRunning = false;
                 _cpuTask.Wait();
             }
         }
