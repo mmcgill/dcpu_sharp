@@ -56,6 +56,13 @@ namespace Com.MattMcGill.Dcpu {
             Invalidate(new Rectangle(col * 12, row * 24, 12, 24));
         }
 
+        public void ResetBuffer(DisplayState displayState) {
+            for (int i=0; i < DisplayState.Width * DisplayState.Height; ++i) {
+                _buffer[i] = displayState.Read((ushort)(DisplayState.DisplayAddress + i));
+            }
+            Invalidate();
+        }
+
         private void DoPaint(object sender, PaintEventArgs e) {
             var g = e.Graphics;
 

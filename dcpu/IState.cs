@@ -43,6 +43,8 @@ namespace Com.MattMcGill.Dcpu {
 
         IState Map(ushort from, ushort to, DeviceState device);
 
+        DeviceState GetDeviceState(string deviceId);
+
         IState Handle(IEvent e);
     }
 }

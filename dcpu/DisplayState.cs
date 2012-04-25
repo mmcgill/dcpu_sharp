@@ -23,7 +23,7 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         public override ushort Read(ushort addr) {
-            return _displayMemory[addr];
+            return _displayMemory[addr - DisplayAddress];
         }
 
         public override DeviceState Write(ushort addr, ushort newValue) {

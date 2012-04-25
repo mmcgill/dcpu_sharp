@@ -87,6 +87,10 @@ namespace Com.MattMcGill.Dcpu {
             return new ImmutableState(this, from, to, device);
         }
 
+        public DeviceState GetDeviceState(string deviceId) {
+            return _deviceStates[deviceId];
+        }
+
         public IState Handle(IEvent e) {
             if (_deviceStates.ContainsKey(e.DeviceId))
                 return new ImmutableState(this, e);

@@ -10,20 +10,21 @@ namespace Com.MattMcGill.Dcpu {
 
         public bool IsRunning { get; private set; }
 
-        private IState _state;
+        public IState State { get; set; }
+
         private Task _cpuTask;
         public ConcurrentQueue<IEvent> _pendingEvents;
 
         public Dcpu(IState initial) {
             IsRunning = false;
-            _state = initial;
+            State = initial;
             _pendingEvents = new ConcurrentQueue<IEvent>();
         }
 
         public void Start() {
             if (!IsRunning) {
                 IsRunning = true;
-                _cpuTask = Task.Factory.StartNew(() => CpuLoop());
+                _cpuTask = Task.Factory.StartNew(CpuLoop);
             }
         }
 
@@ -42,19 +43,19 @@ namespace Com.MattMcGill.Dcpu {
             while (IsRunning) {
                 IEvent e;
                 if (_pendingEvents.TryDequeue(out e)) {
-                    _state = _state.Handle(e);
+                    State = State.Handle(e);
                 }
 
-                var pc = _state.Get(Register.PC);
-                var sp = _state.Get(Register.SP);
+                var pc = State.Get(Register.PC);
+                var sp = State.Get(Register.SP);
                 var origSp = sp;
 
-                var op = Dcpu.FetchNextInstruction(_state, ref pc, ref sp);
+                var op = Dcpu.FetchNextInstruction(State, ref pc, ref sp);
 
-                _state = _state.Set(Register.PC, pc);
+                State = State.Set(Register.PC, pc);
                 if (origSp != sp)
-                    _state = _state.Set(Register.SP, sp);
-                _state = op.Apply(_state);
+                    State = State.Set(Register.SP, sp);
+                State = op.Apply(State);
             }
         }
 

@@ -57,6 +57,10 @@ namespace Com.MattMcGill.Dcpu {
             return this;
         }
 
+        public DeviceState GetDeviceState(string deviceId) {
+            return _deviceStates[deviceId];
+        }
+
         public IState Handle(IEvent e) {
             if (_deviceStates.ContainsKey(e.DeviceId)) {
                 _deviceStates[e.DeviceId] = _deviceStates[e.DeviceId].Handle(e);
