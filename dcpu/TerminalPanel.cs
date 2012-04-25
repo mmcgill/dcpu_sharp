@@ -20,6 +20,7 @@ namespace Com.MattMcGill.Dcpu {
             InitializeComponent();
             Width = 384;
             Height = 288;
+            DoubleBuffered = true;
             LoadDefaultTileset();
         }
 

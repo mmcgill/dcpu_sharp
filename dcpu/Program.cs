@@ -32,7 +32,6 @@ namespace Com.MattMcGill.Dcpu {
             var mainForm = new MainForm(_cpu, displayState);
 
             mainForm.FormClosed += new FormClosedEventHandler( (obj, arg) => _cpu.Stop());
-            _cpu.Start();
 
             Application.EnableVisualStyles();
             Application.Run(mainForm);

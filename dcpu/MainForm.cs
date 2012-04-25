@@ -18,8 +18,19 @@ namespace Com.MattMcGill.Dcpu {
         public MainForm(Dcpu dcpu, DisplayState initialDisplayState) {
             InitializeComponent();
             _dcpu = dcpu;
+            _stopStartBtn.Text = "Start";
             _terminalPanel.Dcpu = dcpu;
             _terminalPanel.BindTo(initialDisplayState);
+        }
+
+        private void HandleStartStopClick(object sender, EventArgs e) {
+            if (_dcpu.IsRunning) {
+                _dcpu.Stop();
+                _stopStartBtn.Text = "Start";
+            } else {
+                _dcpu.Start();
+                _stopStartBtn.Text = "Stop";
+            }
         }
     }
 }
