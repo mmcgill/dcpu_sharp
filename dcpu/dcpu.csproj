@@ -59,11 +59,11 @@
     <Compile Include="KeyboardState.cs" />
     <Compile Include="MutableState.cs" />
     <Compile Include="PersistentArray.cs" />
-    <Compile Include="Terminal.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Terminal.Designer.cs">
-      <DependentUpon>Terminal.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IDevice.cs" />
     <Compile Include="IState.cs" />
@@ -72,6 +72,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Register.cs" />
     <Compile Include="Dcpu.cs" />
+    <Compile Include="TerminalPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TerminalPanel.Designer.cs">
+      <DependentUpon>TerminalPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tests\DcpuTest.cs" />
     <Compile Include="BasicOp.cs" />
     <Compile Include="Tests\BasicOpTest.cs" />
@@ -88,13 +94,16 @@
     <None Include="Examples\conway.asm" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Terminal.resx">
-      <DependentUpon>Terminal.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Examples\colortest.asm" />
     <Content Include="Examples\echo.asm" />
+    <EmbeddedResource Include="TerminalPanel.resx">
+      <DependentUpon>TerminalPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="tileset.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

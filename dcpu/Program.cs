@@ -29,13 +29,13 @@ namespace Com.MattMcGill.Dcpu {
                 displayState);
             _cpu = new Dcpu(state);
 
-            var terminal = new Terminal(_cpu, displayState);
+            var mainForm = new MainForm(_cpu, displayState);
 
-            terminal.FormClosed += new FormClosedEventHandler( (obj, arg) => _cpu.Stop());
+            mainForm.FormClosed += new FormClosedEventHandler( (obj, arg) => _cpu.Stop());
             _cpu.Start();
 
             Application.EnableVisualStyles();
-            Application.Run(terminal);
+            Application.Run(mainForm);
         }
 
         private static void PrintUsage() {

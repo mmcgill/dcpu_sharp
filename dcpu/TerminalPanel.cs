@@ -1,29 +1,30 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
 
 namespace Com.MattMcGill.Dcpu {
-    public partial class Terminal : Form {
+    public partial class TerminalPanel : UserControl {
 
+        public Dcpu Dcpu { get; set; }
         private Image _tileset;
-        private Dcpu _dcpu;
+        
         private ushort[] _buffer = new ushort[DisplayState.Width * DisplayState.Height];
 
-        public Terminal(Dcpu dcpu, DisplayState initialDisplayState) {
+        public TerminalPanel() {
             InitializeComponent();
+            Width = 384;
+            Height = 288;
             LoadDefaultTileset();
+        }
 
-            _dcpu = dcpu;
-            KeyPress += new KeyPressEventHandler(HandleKeyPress);
-            initialDisplayState.OnWrite += new EventHandler<DeviceWriteEventArgs>(HandleDisplayUpdate);
+        public void BindTo(DisplayState displayState) {
+            displayState.OnWrite += new EventHandler<DeviceWriteEventArgs>(HandleDisplayUpdate);
         }
 
         private void LoadDefaultTileset() {
@@ -37,7 +38,7 @@ namespace Com.MattMcGill.Dcpu {
         }
 
         private void HandleKeyPress(object sender, KeyPressEventArgs args) {
-            _dcpu.NewEvent(new KeyboardEvent(args.KeyChar));
+            Dcpu.NewEvent(new KeyboardEvent(args.KeyChar));
             args.Handled = true;
         }
 
@@ -56,6 +57,7 @@ namespace Com.MattMcGill.Dcpu {
 
         private void DoPaint(object sender, PaintEventArgs e) {
             var g = e.Graphics;
+
             var startCol = e.ClipRectangle.Left / 12;
             var startRow = e.ClipRectangle.Top / 24;
             var endCol = e.ClipRectangle.Right / 12 + 1;
